@@ -1,0 +1,79 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home - Food & Drinks Shop</title>
+    <link rel="stylesheet" href="/css/home.css">
+    <link rel="stylesheet" href="/css/search.css">
+    <link rel="stylesheet" href="/css/recomendedProducts.css">
+</head>
+<body>
+    <header th:replace="fragments/common::nav"></header>
+    <h1>Shop Our Products</h1>
+
+    <div class="search-container">
+        <input type="text" id="search-bar" placeholder="Search for products..." class="search-input">
+        <button type="button" class="search-btn">
+            <img src="/images/magnifier.png" alt="Search" class="search-icon">
+        </button>        
+    </div>
+
+    <div class="recommended-container">
+        <h2>Recommended for You</h2>
+        <br>
+        <div class="recommended-products">
+            <div class="recommended-product">
+                <img src="pictures/coke.png" alt="Coca Cola">
+                <p>Coca Cola - $2.99</p>
+                <a href="productDetails.html" class="btn">View Details</a>
+            </div>
+            <div class="recommended-product">
+                <img src="pictures/oranges.png" alt="Chips">
+                <p>Oranges - $1.99</p>
+                <a href="productDetails.html" class="btn">View Details</a>
+            </div>
+            <div class="recommended-product">
+                <img src="juice.png" alt="Orange Juice">
+                <p>Orange Juice - $3.49</p>
+                <a href="productDetails.html" class="btn">View Details</a>
+            </div>
+            <div class="recommended-product">
+                <img src="cookies.png" alt="Cookies">
+                <p>Cookies - $2.50</p>
+                <a href="productDetails.html" class="btn">View Details</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content: Product Listing -->
+    <div class="products-container">
+       
+        <div class="products">
+            <!-- Product Item -->
+            <div class="product">
+                <img src="coke.png" alt="Product 1">
+                <h3>Product 1</h3>
+                <p>$19.99</p>
+                <a href="productDetails.html" class="btn">View Details</a>
+            </div>
+            <!-- Product Item -->
+            <div class="product">
+                <img src="product2.jpg" alt="Product 2">
+                <h3>Product 2</h3>
+                <p>$29.99</p>
+                <a href="productDetails.html" class="btn">View Details</a>
+            </div>
+            <!-- Product Item -->
+            <div class="product">
+                <img src="product3.jpg" alt="Product 3">
+                <h3>Product 3</h3>
+                <p>$9.99</p>
+                <a href="productDetails.html" class="btn">View Details</a>
+            </div>
+            <!-- Add more products as needed -->
+        </div>
+    </div>
+
+    
+</body>
+</html>

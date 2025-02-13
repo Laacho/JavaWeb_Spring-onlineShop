@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Product - Admin</title>
+    <link rel="stylesheet" href="/css/home.css">
+    <link rel="stylesheet" href="/css/editProductDetails.css">
+</head>
+<body>
+    <header th:replace="fragments/common::nav"></header>
+
+    <div class="edit-product-container">
+        <h1>Edit Product</h1>
+
+        <form class="edit-product-form">
+            <div class="image-container">
+                <img src="coke.png" alt="Product Image" class="product-image">
+            </div>
+
+            <label for="product-name">Product Name:</label>
+            <input type="text" id="product-name" value="Product Name 1">
+
+            <label for="product-price">Price ($):</label>
+            <input type="number" id="product-price" value="15.99" step="0.01">
+
+            <label for="product-category">Category:</label>
+            <select id="product-category">
+                <option value="electronics" selected>Electronics</option>
+                <option value="clothing">Clothing</option>
+                <option value="books">Books</option>
+                <option value="home">Home</option>
+            </select>
+
+            <label for="product-quantity">Quantity:</label>
+            <input type="number" id="product-quantity" value="50">
+
+            <label for="product-description">Description:</label>
+            <textarea id="product-description">This is a sample product description.</textarea>
+
+            <!-- Availability Toggle -->
+            <div class="toggle-container">
+                <label for="product-availability">Available:</label>
+                <label class="switch">
+                    <input type="checkbox" id="product-availability" checked>
+                    <span class="slider"></span>
+                </label>
+            </div>
+            <label for="profile-pic-url">Profile Picture URL:</label>
+            <input type="text" id="profile-pic-url" placeholder="Paste profile picture URL" value="profile.jpg">
+            
+            <button type="submit" class="save-btn">Save Changes</button>
+        </form>
+    </div>
+</body>
+</html>

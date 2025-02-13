@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>View Your Orders - Food & Drinks Shop</title>
+    <link rel="stylesheet" href="/css/order.css">
+    <link rel="stylesheet" href="/css/home.css">
+</head>
+<body>
+    <header th:replace="fragments/common::nav"></header>
+
+    <div class="orders-container">
+        <h2>Your Orders</h2>
+        <table class="orders-table">
+            <thead>
+                <tr>
+                    <th>Order ID</th>
+                    <th>Order Amount</th>
+                    <th>Order Description</th>
+                    <th>Order Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>#1001</td>
+                    <td>$25.99</td>
+                    <td>2x Coca Cola, 1x Chips</td>
+                    <td>Today</td>
+                </tr>
+                <tr>
+                    <td>#1002</td>
+                    <td>$15.49</td>
+                    <td>1x Orange Juice, 2x Cookies</td>
+                    <td> Yesterday</td>
+                </tr>
+                <tr>
+                    <td>#1003</td>
+                    <td>$10.00</td>
+                    <td>1x Mineral Water, 1x Chocolate Bar</td>
+                    <td> Yesterday</td>
+                </tr>
+                <tr>
+                    <td>#1004</td>
+                    <td>$30.99</td>
+                    <td>3x Energy Drink, 1x Chips</td>
+                    <td> Yesterday</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>

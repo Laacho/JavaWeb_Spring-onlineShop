@@ -1,0 +1,75 @@
+/* Shipment Tracking Page */
+.shipment-container {
+    max-width: 50%;
+    margin: 40px auto;
+    padding: 20px;
+    background-color: white;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+    text-align: center;
+}
+
+.shipment-container h2 {
+    color: #0277bd;
+    margin-bottom: 20px;
+}
+
+/* Form Styling */
+#tracking-form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+#tracking-number {
+    padding: 10px;
+    width: 80%;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    margin-bottom: 10px;
+}
+
+.btn {
+    padding: 10px 20px;
+    background-color: #0277bd;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.btn:hover {
+    background-color: #01579b;
+}
+
+/* Shipment Result */
+#shipment-result {
+    background-color: #e3f2fd;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+    margin-top: 20px;
+    text-align: left;
+}
+
+#shipment-result h3 {
+    color: #0277bd;
+}
+
+#shipment-result p {
+    margin: 8px 0;
+    color: #333;
+}
+
+/* Error Message */
+.error-message {
+    color: red;
+    font-weight: bold;
+}
+
+/* Hidden Class */
+.hidden {
+    display: none;
+}

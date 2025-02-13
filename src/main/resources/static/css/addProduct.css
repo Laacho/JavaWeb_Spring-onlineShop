@@ -1,0 +1,57 @@
+/* Admin Panel Container */
+.admin-container {
+    max-width: 600px;
+    margin: 40px auto;
+    padding: 20px;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+    text-align: center;
+}
+
+/* Form Styling */
+.product-form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+label {
+    font-weight: bold;
+    text-align: left;
+    display: block;
+}
+
+input, select, textarea {
+    width: 95%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+.error-message {
+    color: red;
+    font-size: 12px;
+    min-height: 16px; /* Ensures space for errors */
+}
+
+select {
+    width: 50%;
+    font-size: 14px;
+}
+/* Submit Button */
+.btn {
+    padding: 10px 20px;
+    background-color: #0277bd;
+    color: white;
+    font-size: 16px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: transform 0.2s, background-color 0.3s;
+}
+
+.btn:hover {
+    background-color: #01579b;
+    transform: scale(1.05);
+}

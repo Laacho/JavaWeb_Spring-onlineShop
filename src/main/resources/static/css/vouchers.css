@@ -1,0 +1,57 @@
+/* Vouchers Page */
+.vouchers-container {
+    max-width: 70%;
+    margin: 40px auto;
+    padding: 20px;
+    background-color: white;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+    text-align: center;
+}
+
+.vouchers-container h2 {
+    color: #0277bd;
+    margin-bottom: 20px;
+}
+
+/* Table Styling */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+th, td {
+    border: 1px solid #ddd;
+    padding: 12px;
+    text-align: center;
+}
+
+th {
+    background-color: #0277bd;
+    color: white;
+}
+
+td {
+    color: #333;
+}
+
+.active {
+    color: green;
+    font-weight: bold;
+}
+
+.expired {
+    color: red;
+    font-weight: bold;
+}
+.hidden {
+    display: none;
+}
+
+#no-vouchers-message {
+    font-size: 18px;
+    color: #fc0000;
+    margin-top: 20px;
+    font-weight: bold;
+}

@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Add Product</title>
+    <link rel="stylesheet" href="/css/home.css">
+    <link rel="stylesheet" href="/css/addProduct.css">
+</head>
+<body>
+<header th:replace="fragments/common::nav"></header>
+
+
+    <div class="admin-container">
+        <h1>Add a New Product</h1>
+        <form class="product-form">
+            <!-- Product Name -->
+            <label for="name">Product Name</label>
+            <input type="text" id="name" name="name" required>
+            <div class="error-message" id="name-error"></div>
+
+            <!-- Photo URL -->
+            <label for="photo">Product Image URL</label>
+            <input type="text" id="photo" name="photo" required>
+           
+            <!-- Price -->
+            <label for="price">Price ($)</label>
+            <input type="number" id="price" name="price" step="0.01" required>
+            <div class="error-message" id="photo-error"></div> 
+            <!-- Category -->
+            <label for="category">Category</label>
+            <select id="category" name="category" required>
+                <option value="">Select a category</option>
+                <option value="Drinks">Drinks</option>
+                <option value="Snacks">Snacks</option>
+                <option value="Dairy">Dairy</option>
+                <option value="Frozen">Frozen</option>
+                <option value="Bakery">Bakery</option>
+            </select>
+            <div class="error-message" id="category-error"></div>
+            <!-- Quantity -->
+            <label for="quantity">Quantity</label>
+            <input type="number" id="quantity" name="quantity" min="1" required>
+            <div class="error-message" id="quantity-error"></div>
+            <!-- Description -->
+            <label for="description">Product Description</label>
+            <textarea id="description" name="description" rows="4" required></textarea>
+            <div class="error-message" id="description-error"></div>
+            <!-- Submit Button -->
+            <button type="submit" class="btn">Add Product</button>
+        </form>
+    </div>
+
+</body>
+</html>

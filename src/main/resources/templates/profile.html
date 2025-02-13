@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Profile</title>
+    <link rel="stylesheet" href="/css/home.css">
+    <link rel="stylesheet" href="/css/profile.css">
+
+</head>
+<body>
+    <header th:replace="fragments/common::nav"></header>
+
+    <!-- Profile Section -->
+    <div class="profile-container">
+        <div class="profile-card">
+            <img src="/images/user.png" alt="Profile Picture" class="profile-pic">
+            <form>
+                <label>First Name</label>
+                <input type="text" name="firstName" class="input-field" placeholder="Enter first name">
+                
+                <label>Last Name</label>
+                <input type="text" name="lastName" class="input-field" placeholder="Enter last name">
+                
+                <label>Email</label>
+                <input type="email" name="email" class="input-field" placeholder="Enter email">
+                
+                <label>Address</label>
+                <input type="text" name="address" class="input-field" placeholder="Enter address">
+                
+                <label> Profile picture</label>
+                <input type="text" name="profilePicture" class="input-field" placeholder="Paste your link here">
+                <button type="submit" class="btn save-btn">Save</button>
+               <a href="index.html">
+                    <button type="button" class="btn logout-btn">Logout
+                    </button>
+                </a> 
+            </form>
+        </div>
+    </div>
+</body>
+</html>

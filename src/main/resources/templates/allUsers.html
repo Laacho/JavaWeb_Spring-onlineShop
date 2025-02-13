@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>All Users - Admin Panel</title>
+    <link rel="stylesheet" href="/css/home.css">
+    <link rel="stylesheet" href="/css/allUsers.css">
+</head>
+<body>
+
+   <header th:replace="fragments/common::nav"></header>
+
+    <div class="users-container">
+        <h1>All Users</h1>
+
+        <table class="users-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Username</th>
+                    <th>Email</th>
+                    <th>Role</th>
+                    <th>Change Role</th>
+                    <th>Status</th>
+                    <th>Change Status</th>
+                    <th>Address</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Sample User Data -->
+                <tr>
+                    <td>1</td>
+                    <td>JohnDoe</td>
+                    <td>john@example.com</td>
+                    <td><span class="role admin">ADMIN</span></td>
+                    <td>
+                        <form>
+                            <input type="hidden" name="userId" >
+                            <button type="submit" class="btn">Change Role</button>
+                        </form>
+                    </td>
+                    <td><span class="status active">ACTIVE</span></td>
+                    <td>
+                        <form>
+                            <input type="hidden" name="userId" >
+                            <button type="submit" class="btn">Change Status</button>
+                        </form>
+                    </td>
+                    <td>
+                        123 Main St, NY 
+                    </td>
+                </tr>
+                <tr>
+                    <td>2</td>
+                    <td>JaneSmith</td>
+                    <td>jane@example.com</td>
+                    <td><span class="role user">USER</span></td>
+                    <td>
+                        <form>
+                            <input type="hidden" name="userId" >
+                            <button type="submit" class="btn">Change Role</button>
+                        </form>
+                    </td>
+                    <td><span class="status inactive">INACTIVE</span></td>
+                    <td>
+                        <form>
+                            <input type="hidden" name="userId" >
+                            <button type="submit" class="btn">Change Status</button>
+                        </form>
+                    </td>
+                    <td>
+                        456 Park Ave, LA
+                    </td>
+                </tr>
+                <tr>
+                    <td>3</td>
+                    <td>MikeBrown</td>
+                    <td>mike@example.com</td>
+                    <td><span class="role admin">ADMIN</span></td>
+                    <td>
+                        <form>
+                            <input type="hidden" name="userId" >
+                            <button type="submit" class="btn">Change Role</button>
+                        </form>
+                    </td>
+                    <td><span class="status active">ACTIVE</span></td>
+                    <td>
+                        <form>
+                            <input type="hidden" name="userId" >
+                            <button type="submit" class="btn">Change Status</button>
+                        </form>
+                    </td>
+                    <td>789 Sunset Blvd, SF</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+</body>
+</html>

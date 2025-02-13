@@ -1,0 +1,25 @@
+.search-suggestions {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background-color: white;
+    border: 1px solid #ccc;
+    border-top: none;
+    border-radius: 5px;
+    max-height: 200px;
+    overflow-y: auto;
+    /* display: none; Hidden by default */
+}
+
+.search-suggestions a {
+    display: block;
+    padding: 10px;
+    text-decoration: none;
+    color: #0277bd;
+    border-bottom: 1px solid #ddd;
+}
+
+.search-suggestions a:hover {
+    background-color: #f0f0f0;
+}
