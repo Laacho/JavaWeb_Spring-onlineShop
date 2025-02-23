@@ -32,7 +32,8 @@ input, select, textarea {
 .error-message {
     color: red;
     font-size: 12px;
-    min-height: 16px; /* Ensures space for errors */
+    min-height: 16px;
+    /* Ensures space for errors */
 }
 
 select {
