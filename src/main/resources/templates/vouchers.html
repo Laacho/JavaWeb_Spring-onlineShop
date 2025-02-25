@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -12,7 +12,7 @@
 
     <div class="vouchers-container">
         <h2>My Vouchers</h2>
-        <table >
+        <table th:if="${user.vouchers.size()>0}" >
             <thead>
                 <tr>
                     <th>Voucher Code</th>
@@ -22,11 +22,15 @@
                 </tr>
             </thead>
             <tbody id="voucher-list">
-                <!-- Vouchers will be displayed here dynamically -->
+                <tr th:each="voucher : ${user.vouchers}">
+                    <td th:text="${voucher.code}"></td>
+                    <td th:text="${voucher.discountAmount} + '%'"></td>
+                    <td th:text="${#temporals.format(voucher.deadline, 'yyyy-MM-dd')}"></td>
+                    <td th:text="${voucher.deadline.isAfter(#temporals.createNow()) ? 'Active' : 'Expired'}"></td>
+                </tr>
             </tbody>
         </table>
-        <p id="no-vouchers-message" >You have no vouchers available at the moment.</p>
-        <!-- make this red -->
+        <p id="no-vouchers-message" th:if="${user.vouchers.isEmpty()}">You have no vouchers available at the moment.</p>
     </div>
 </body>
 </html>
