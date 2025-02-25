@@ -39,7 +39,7 @@ public class User {
     @Column(unique = true)
     private String email;
 
-    @Column(unique = true)
+    @Column(unique = true,nullable = false)
     private String address;
 
     @Enumerated(EnumType.STRING)

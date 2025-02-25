@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,7 +9,7 @@
 </head>
 <body>
 
-   <header th:replace="fragments/common::nav"></header>
+   <header th:replace="fragments/common::nav(user=${user})"></header>
 
     <div class="users-container">
         <h1>All Users</h1>
@@ -29,69 +29,31 @@
             </thead>
             <tbody>
                 <!-- Sample User Data -->
-                <tr>
-                    <td>1</td>
-                    <td>JohnDoe</td>
-                    <td>john@example.com</td>
-                    <td><span class="role admin">ADMIN</span></td>
+                <tr th:each="user : ${allUsers}">
+                    <td th:text="${user.id}">1</td>
+                    <td th:text="${user.username}">JohnDoe</td>
+                    <td th:text="${#strings.isEmpty(user.email)? 'Edit profile to add email' :user.email}">john@example.com</td>
                     <td>
-                        <form>
+                        <span class="role admin" th:text="${user.role.name()}">ADMIN</span></td>
+                    <td>
+                        <form th:action="@{'/user/'+${user.id}+'/role'}" th:method="PUT">
                             <input type="hidden" name="userId" >
                             <button type="submit" class="btn">Change Role</button>
                         </form>
                     </td>
-                    <td><span class="status active">ACTIVE</span></td>
                     <td>
-                        <form>
+                        <span class="status active" th:if="${user.active}">ACTIVE</span>
+                        <span class="status inactive" th:if="${user.active==false}">INACTIVE</span>
+                    </td>
+                    <td>
+                        <form th:action="@{'/user/'+${user.id}+'/status'}" th:method="PUT">
                             <input type="hidden" name="userId" >
                             <button type="submit" class="btn">Change Status</button>
                         </form>
                     </td>
-                    <td>
+                    <td th:text="${user.address}">
                         123 Main St, NY 
                     </td>
-                </tr>
-                <tr>
-                    <td>2</td>
-                    <td>JaneSmith</td>
-                    <td>jane@example.com</td>
-                    <td><span class="role user">USER</span></td>
-                    <td>
-                        <form>
-                            <input type="hidden" name="userId" >
-                            <button type="submit" class="btn">Change Role</button>
-                        </form>
-                    </td>
-                    <td><span class="status inactive">INACTIVE</span></td>
-                    <td>
-                        <form>
-                            <input type="hidden" name="userId" >
-                            <button type="submit" class="btn">Change Status</button>
-                        </form>
-                    </td>
-                    <td>
-                        456 Park Ave, LA
-                    </td>
-                </tr>
-                <tr>
-                    <td>3</td>
-                    <td>MikeBrown</td>
-                    <td>mike@example.com</td>
-                    <td><span class="role admin">ADMIN</span></td>
-                    <td>
-                        <form>
-                            <input type="hidden" name="userId" >
-                            <button type="submit" class="btn">Change Role</button>
-                        </form>
-                    </td>
-                    <td><span class="status active">ACTIVE</span></td>
-                    <td>
-                        <form>
-                            <input type="hidden" name="userId" >
-                            <button type="submit" class="btn">Change Status</button>
-                        </form>
-                    </td>
-                    <td>789 Sunset Blvd, SF</td>
                 </tr>
             </tbody>
         </table>

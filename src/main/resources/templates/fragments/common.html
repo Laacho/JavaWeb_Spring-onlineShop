@@ -1,26 +1,29 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <title>Food & Drinks Shop</title>
 </head>
 <body>
-          <nav class="navbar">
+<!--          add this below th:fragment="nav(user)"-->
+          <nav class="navbar" >
             <p class="logo">Food & Drinks Shop</p>
             <div class="nav-links">
-              <a href="home.html">Home</a>
-              <a href="orderHistory.html"> View Your orders</a>
-              <a href="shipmentStatus.html"> Shipment status</a>
-              <a href="vouchers.html"> My vouchers</a>
+              <a th:href="@{/home}">Home</a>
+              <a th:href="@{/orders/history}"> View Your orders</a>
+              <a th:href="@{/shipment}"> Shipment status</a>
+              <a th:href="@{/vouchers}"> My vouchers</a>
               <a href="todaysDeals.html">Today's Deals</a>
-              <a href="addAproduct.html"> Add product</a>
-              <a href="editProduct.html"> Edit product</a>
-              <a  href="allUsers.html"> All users</a>
+              <a th:href="@{/products/add}"> Add product</a>
+              <a th:href="@{/products/edit}"> Edit product</a>
+              <a  th:href="@{/user/all}"> All users</a>
 
             </div>
             <div class="profile-cart">
-              <a href="profile.html" class="profile-link">
-                <img src="/images/user.png" alt="Profile" class="icon">
+<!--              <a href="/" class="profile-link"></a>-->
+              <a th:href="@{'/user/'+${user.id}+'/profile'}" class="profile-link">
+              <img th:src="${#strings.isEmpty(user.profilePicture) ? '/images/user.png' : user.profilePicture}" alt="Profile" class="icon">
+<!--                <img scr="/images/user.png" alt="Profile" class="icon">-->
               </a>
               <a href="shoppingCart.html" class="cart-button">
                 <img src="/images/cart.png" alt="Cart" class="icon">
