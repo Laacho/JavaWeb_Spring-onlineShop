@@ -8,7 +8,7 @@
 <body>
     <div class="container">
         <h1>Register</h1>
-        <form action="#" method="post">
+        <form th:action="@{/register}" method="post">
             <label for="username">Username</label>
             <input placeholder="Username" type="text" id="username" name="username" class="wide-input" required>
             
@@ -22,8 +22,8 @@
             <button type="submit" class="btn">Register</button>
         
         </form>
-        <p>Already have an account? <a href="login.html">Login</a></p>
-        <p><a href="index.html" class="btn">Back to Home</a></p>
+        <p>Already have an account? <a th:href="@{/login}">Login</a></p>
+        <p><a th:href="@{/}" class="btn">Back to Home</a></p>
     </div>
 </body>
 </html>

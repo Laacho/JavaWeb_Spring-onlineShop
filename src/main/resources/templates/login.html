@@ -8,17 +8,17 @@
 <body>
     <div class="container">
         <h1>Login</h1>
-        <form action="#" method="post">
+        <form th:action="@{/login}" method="post">
             <label for="username">Username</label>
             <input placeholder="Username" type="text" id="username" name="username" class="wide-input" required>
             
             <label for="password">Password</label>
             <input placeholder="Password" type="password" id="password" name="password" class="wide-input" required>
-            
+            <p th:if="${error}" th:text="${error}" class="error-message"></p>
             <button type="submit" class="btn">Login</button>
         </form>
-        <p>Don't have an account? <a href="register.html">Register here</a></p>
-        <p><a href="index.html" class="btn">Back to Home</a></p>
+        <p>Don't have an account? <a th:href="@{/register}">Register here</a></p>
+        <p><a th:href="@{/}" class="btn">Back to Home</a></p>
     </div>
 </body>
 </html>
