@@ -2,6 +2,8 @@ package app.products.repository;
 
 import app.products.model.Product;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -13,5 +15,11 @@ public interface ProductsRepository extends JpaRepository<Product, UUID> {
     Optional<Product> findByName(String name);
 
     List<Product> findAllByIsAvailable(boolean available);
+    List<Product> findAllByNameContainingIgnoreCase(String name);
 
+    List<Product> findByIsOnDeal(boolean onDeal);
+
+    @Modifying
+    @Query("UPDATE Product p SET p.isOnDeal = false")
+    void removeAllDeals();
 }
