@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,29 +9,31 @@
 
 </head>
 <body>
-    <header th:replace="fragments/common::nav"></header>
+    <header th:replace="fragments/common::nav(user=${user})"></header>
 
     <!-- Profile Section -->
     <div class="profile-container">
         <div class="profile-card">
-            <img src="/images/user.png" alt="Profile Picture" class="profile-pic">
-            <form>
+            <img th:src="${#strings.isEmpty(user.profilePicture) ? '/images/user.png' : user.profilePicture}" alt="Profile Picture" class="profile-pic">
+            <form th:action="@{'/user/'+${user.id}+'/profile'}" th:method="PATCH" th:object="${editProfileRequest}">
                 <label>First Name</label>
-                <input type="text" name="firstName" class="input-field" placeholder="Enter first name">
+                <input type="text" name="firstName" class="input-field" placeholder="Enter first name" th:field="*{firstName}">
                 
                 <label>Last Name</label>
-                <input type="text" name="lastName" class="input-field" placeholder="Enter last name">
+                <input type="text" name="lastName" class="input-field" placeholder="Enter last name" th:field="*{lastName}">
                 
                 <label>Email</label>
-                <input type="email" name="email" class="input-field" placeholder="Enter email">
+                <input type="email" name="email" class="input-field" placeholder="Enter email" th:field="*{email}">
                 
                 <label>Address</label>
-                <input type="text" name="address" class="input-field" placeholder="Enter address">
+                <input type="text" name="address" class="input-field" placeholder="Enter address" th:field="*{address}">
                 
                 <label> Profile picture</label>
-                <input type="text" name="profilePicture" class="input-field" placeholder="Paste your link here">
+                <input type="text" name="profilePicture" class="input-field" placeholder="Paste your link here" th:field="*{profilePicture}">
+
+
                 <button type="submit" class="btn save-btn">Save</button>
-               <a href="index.html">
+               <a th:href="@{/logout}">
                     <button type="button" class="btn logout-btn">Logout
                     </button>
                 </a> 

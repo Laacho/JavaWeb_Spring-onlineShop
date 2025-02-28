@@ -19,6 +19,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
@@ -31,16 +32,15 @@ public class UserService implements UserDetailsService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final ShoppingCartRepository shoppingCartRepository;
-    private final CloudinaryService cloudinaryService;
 
     @Autowired
-    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, ShoppingCartRepository shoppingCartRepository, CloudinaryService cloudinaryService) {
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, ShoppingCartRepository shoppingCartRepository) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.shoppingCartRepository = shoppingCartRepository;
-        this.cloudinaryService = cloudinaryService;
     }
 
+    @Transactional
     public void register(RegisterRequest registerRequest) {
         Optional<User> optionalUser = userRepository.findByUsernameOrAddress(registerRequest.getUsername(),registerRequest.getAddress());
         if (optionalUser.isPresent()) {
@@ -64,24 +64,21 @@ public class UserService implements UserDetailsService {
     public List<User> getAllByRole(UserRole role) {
        return userRepository.findAllByRole(role);
     }
-//    @Cacheable(value = "users",key = "#id")
-//    public List<User> allUsers(){
-//        return userRepository.findAll();
-//    }
-//    @CachePut(value = "users", key = "#user.id")
-//    public User updateUser(User user) {
-//        System.out.println("Updating user...");
-//      //  database.put(user.getId(), user);
-//        return user;
-//    }
-//
-//    @CacheEvict(value = "users", key = "#id")
-//    public void deleteUser(UUID id) {
-//
-//        userRepository.deleteById(id);
-//    }
 
-
+    @Transactional
+    public void initializeDefaultAdmin(RegisterRequest registerRequest){
+        LocalDateTime now = LocalDateTime.now();
+        User defaultAdmin = User.builder()
+                .username(registerRequest.getUsername())
+                .password(passwordEncoder.encode(registerRequest.getPassword()))
+                .address(registerRequest.getAddress())
+                .role(UserRole.ADMIN)
+                .isActive(true)
+                .createdAt(now)
+                .updatedAt(now)
+                .build();
+        userRepository.save(defaultAdmin);
+    }
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
@@ -103,52 +100,13 @@ public class UserService implements UserDetailsService {
     }
     public void editProfile(UUID userId, EditProfileRequest editProfileRequest) {
         User user = getById(userId);
-
-        if(editProfileRequest.getProfilePicture() != null &&
-                !editProfileRequest.getProfilePicture().isBlank()
-            && !editProfileRequest.getProfilePicture().contains("res.cloudinary.com")
-        ){
-
-            String stringCompletableFuture = uploadToCloud(editProfileRequest.getProfilePicture());
-            user.setProfilePicture(stringCompletableFuture);
-        }
-        else{
-            user.setProfilePicture(editProfileRequest.getProfilePicture());
-        }
+        user.setProfilePicture(editProfileRequest.getProfilePicture());
         user.setAddress(editProfileRequest.getAddress());
         user.setEmail(editProfileRequest.getEmail());
         user.setFirstName(editProfileRequest.getFirstName());
         user.setLastName(editProfileRequest.getLastName());
 
         userRepository.save(user);
-    }
-
-    private String uploadToCloud(String productImageURL)  {
-            try {
-                return cloudinaryService.uploadFromUrlToUserProfiles(productImageURL);
-            }catch (IOException e){
-                return productImageURL;
-            }
-    }
-    private User initializeDefaultUser(RegisterRequest registerRequest) {
-        LocalDateTime now = LocalDateTime.now();
-        return User.builder()
-                .username(registerRequest.getUsername())
-                .password(passwordEncoder.encode(registerRequest.getPassword()))
-                .address(registerRequest.getAddress())
-                .role(UserRole.USER)
-                .isActive(true)
-                .createdAt(now)
-                .updatedAt(now)
-                .build();
-    }
-
-    private ShoppingCart initShoppingCart(User user) {
-        return ShoppingCart.builder()
-                .user(user)
-                .products(new HashMap<>())
-                .addedAt(LocalDateTime.now())
-                .build();
     }
 
     public List<User> getAllUsers() {
@@ -170,5 +128,26 @@ public class UserService implements UserDetailsService {
             user.setRole(UserRole.USER);
         }
         userRepository.save(user);
+    }
+
+    private User initializeDefaultUser(RegisterRequest registerRequest) {
+        LocalDateTime now = LocalDateTime.now();
+        return User.builder()
+                .username(registerRequest.getUsername())
+                .password(passwordEncoder.encode(registerRequest.getPassword()))
+                .address(registerRequest.getAddress())
+                .role(UserRole.USER)
+                .isActive(true)
+                .createdAt(now)
+                .updatedAt(now)
+                .build();
+    }
+
+    private ShoppingCart initShoppingCart(User user) {
+        return ShoppingCart.builder()
+                .user(user)
+                .products(new HashMap<>())
+                .addedAt(LocalDateTime.now())
+                .build();
     }
 }

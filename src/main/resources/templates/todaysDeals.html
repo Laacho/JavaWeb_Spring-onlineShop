@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="/css/todaysDeals.css">
 </head>
 <body>
-    <header th:replace="fragments/common::nav"></header>
+    <header th:replace="fragments/common::nav(user=${user})"></header>
 
     <div class="deals-container">
         <h1>🔥 Today's Deals 🔥</h1>
@@ -16,38 +16,12 @@
 
         <div class="deals-grid">
             <!-- Product 1 -->
-            <div class="deal-card">
+            <div class="deal-card" th:each="product :${dailyDeals}">
                 <span class="sale-badge">On Sale</span>
-                <img src="coke.png" alt="Coca Cola" class="deal-image">
-                <h3>Coca Cola</h3>
-                <p class="old-price">$2.99</p>
-                <p class="new-price">$1.99</p>
-                <form action="/add-to-cart" method="post">
-                    <input type="hidden" name="productId" value="2">
-                    <button type="submit" class="btn">Add to Cart</button>
-                </form>
-            </div>
-
-            <!-- Product 2 -->
-            <div class="deal-card">
-                <span class="sale-badge">On Sale</span>
-                <img src="chips.png" alt="Potato Chips" class="deal-image">
-                <h3>Potato Chips</h3>
-                <p class="old-price">$4.99</p>
-                <p class="new-price">$3.49</p>
-                <form action="/add-to-cart" method="post">
-                    <input type="hidden" name="productId" value="2">
-                    <button type="submit" class="btn">Add to Cart</button>
-                </form>
-            </div>
-
-            <!-- Product 3 -->
-            <div class="deal-card">
-                <span class="sale-badge">On Sale</span>
-                <img src="chocolate.png" alt="Chocolate Bar" class="deal-image">
-                <h3>Chocolate Bar</h3>
-                <p class="old-price">$1.99</p>
-                <p class="new-price">$0.99</p>
+                <img th:src="${product.photo}" alt="Coca Cola" class="deal-image">
+                <h3 th:text="${product.name}">Coca Cola</h3>
+                <p class="old-price" th:text="${product.price}"></p>
+                <p class="new-price" th:text="'$'+${product.price.subtract(product.discountAmount)}"></p>
                 <form action="/add-to-cart" method="post">
                     <input type="hidden" name="productId" value="2">
                     <button type="submit" class="btn">Add to Cart</button>

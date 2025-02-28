@@ -5,27 +5,26 @@
     <title>Food & Drinks Shop</title>
 </head>
 <body>
-<!--          add this below th:fragment="nav(user)"-->
-          <nav class="navbar" >
+
+          <nav class="navbar" th:fragment="nav(user)">
             <p class="logo">Food & Drinks Shop</p>
             <div class="nav-links">
               <a th:href="@{/home}">Home</a>
               <a th:href="@{/orders/history}"> View Your orders</a>
               <a th:href="@{/shipment}"> Shipment status</a>
               <a th:href="@{/vouchers}"> My vouchers</a>
-              <a href="todaysDeals.html">Today's Deals</a>
-              <a th:href="@{/products/add}"> Add product</a>
-              <a th:href="@{/products/edit}"> Edit product</a>
-              <a  th:href="@{/user/all}"> All users</a>
+              <a th:href="@{/products/today-deals}">Today's Deals</a>
+
+              <a th:if="${user.role.name()=='ADMIN'}" th:href="@{/products/add}"> Add product</a>
+              <a th:if="${user.role.name()=='ADMIN'}" th:href="@{/products/edit}"> Edit product</a>
+              <a  th:if="${user.role.name()=='ADMIN'}" th:href="@{/user/all}"> All users</a>
 
             </div>
             <div class="profile-cart">
-<!--              <a href="/" class="profile-link"></a>-->
               <a th:href="@{'/user/'+${user.id}+'/profile'}" class="profile-link">
               <img th:src="${#strings.isEmpty(user.profilePicture) ? '/images/user.png' : user.profilePicture}" alt="Profile" class="icon">
-<!--                <img scr="/images/user.png" alt="Profile" class="icon">-->
               </a>
-              <a href="shoppingCart.html" class="cart-button">
+              <a th:href="@{/shopping-cart}" class="cart-button">
                 <img src="/images/cart.png" alt="Cart" class="icon">
               </a>
             </div>

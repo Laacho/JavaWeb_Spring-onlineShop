@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,17 +8,17 @@
     <link rel="stylesheet" href="/css/editProduct.css">
 </head>
 <body>
-        <header th:replace="fragments/common::nav"></header>
+        <header th:replace="fragments/common::nav(user=${user})"></header>
 
     <div class="admin-container">
         <h1>Edit Product</h1>
         
-        <form class="search-form">
-            <input type="text" placeholder="Search for a product..." class="search-input">
+        <form class="search-form" th:method="GET" th:action="@{/products/edit/search}" th:object="${adminSearchRequest}">
+            <input type="text" placeholder="Search for a product..." class="search-input" th:field="*{productName}">
             <button type="submit" class="search-btn">Search</button>
         </form>
-        <div class="products-container">
-            <div class="product-box">
+        <div class="products-container" th:each="product : ${search}">
+            <div class="product-box" >
                 <img src="coke.png" alt="Product 1" class="product-image">
                 <div class="product-info">
                     <h3>Product Name 1</h3>
