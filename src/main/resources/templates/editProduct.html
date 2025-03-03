@@ -17,8 +17,9 @@
             <input type="text" placeholder="Search for a product..." class="search-input" th:field="*{productName}">
             <button type="submit" class="search-btn">Search</button>
         </form>
-        <div class="products-container" th:each="product : ${search}">
-            <div class="product-box" >
+
+        <div class="products-container" >
+            <div class="product-box" th:each="product : ${search}">
                 <img th:src="${product.photo}" alt="Product 1" class="product-image">
                 <div class="product-info">
                     <h3 th:text="${product.name}">Product Name 1</h3>

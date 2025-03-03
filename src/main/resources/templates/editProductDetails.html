@@ -37,13 +37,12 @@
 
             <!-- Availability Toggle -->
             <div class="toggle-container">
-                <label for="product-availability">Available:</label>
-                <label class="switch">
-                    <input type="hidden" name="available"  th:field="*{available}" >
-                    <input type="checkbox" id="product-availability" th:checked="${#strings.equals(product.available, true)}">
+                <label class="switch">Available:</label>
+                <input type="radio" id="available-yes" th:field="*{available}" value="true">
+                <label for="available-yes">Yes</label>
 
-                    <span class="slider"></span>
-                </label>
+                <input type="radio" id="available-no" th:field="*{available}" value="false">
+                <label for="available-no">No</label>
             </div>
             <label for="profile-pic-url">Profile Picture URL:</label>
             <input type="text" id="profile-pic-url" placeholder="Paste profile picture URL" value="profile.jpg" th:field="*{image}">
