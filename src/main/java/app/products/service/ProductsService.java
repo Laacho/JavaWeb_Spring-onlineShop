@@ -1,6 +1,6 @@
 package app.products.service;
 
-import app.cloudinary.CloudinaryService;
+
 import app.exceptions.DomainException;
 import app.order_details.service.OrderDetailsService;
 import app.products.model.Product;
@@ -10,42 +10,33 @@ import app.user.model.UserRole;
 import app.user.service.UserService;
 import app.web.dto.AddAProductRequest;
 import app.web.dto.AdminSearchRequest;
-import jakarta.validation.Valid;
+import app.web.dto.EditProductDetails;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
-import java.io.IOException;
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.*;
-import java.util.concurrent.CompletableFuture;
-import java.util.stream.Collectors;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class ProductsService {
 
     private final ProductsRepository productsRepository;
-    private final CloudinaryService cloudinaryService;
     private final UserService userService;
     private final OrderDetailsService orderDetailsService;
 
     @Autowired
-    public ProductsService(ProductsRepository productsRepository, CloudinaryService cloudinaryService, UserService userService, OrderDetailsService orderDetailsService) {
+    public ProductsService(ProductsRepository productsRepository, UserService userService, OrderDetailsService orderDetailsService) {
         this.productsRepository = productsRepository;
-        this.cloudinaryService = cloudinaryService;
         this.userService = userService;
         this.orderDetailsService = orderDetailsService;
     }
 
     public void addAproduct(AddAProductRequest productRequest)  {
         checkForUniqueProductName(productRequest.getProductName());
-        CompletableFuture<String> stringCompletableFuture = uploadToCloud(productRequest.getProductImageURL());
-        stringCompletableFuture.thenAcceptAsync(urlFromCloud  -> {
-            Product product = initProduct(productRequest, urlFromCloud);
-            productsRepository.save(product);
-        });
+        Product product = initProduct(productRequest);
+        productsRepository.save(product);
     }
 
     public List<Product> findAllProductsDependingOnRole(UserRole role) {
@@ -77,11 +68,11 @@ public class ProductsService {
         return productsRepository.findById(id).orElseThrow(() -> new DomainException("Product not found"));
     }
 
-    private Product initProduct(AddAProductRequest productRequest, String urlFromCloud) {
+    private Product initProduct(AddAProductRequest productRequest) {
         LocalDateTime now = LocalDateTime.now();
         return Product.builder()
                 .name(productRequest.getProductName())
-                .photo(urlFromCloud)
+                .photo(productRequest.getProductImageURL())
                 .price(productRequest.getPrice())
                 .category(productRequest.getCategory())
                 .quantity(productRequest.getQuantity())
@@ -100,13 +91,21 @@ public class ProductsService {
         }
     }
 
-    private CompletableFuture<String> uploadToCloud(String productImageURL)  {
-        return CompletableFuture.supplyAsync(()->{
-            try {
-                return cloudinaryService.uploadFromUrlToProducts(productImageURL);
-            }catch (IOException e){
-                return productImageURL;
-            }
-        });
+
+    public List<Product> searchByName(String productName) {
+        return productsRepository.findByNameContainingIgnoreCase(productName);
+    }
+
+    public void updateProduct(UUID id, EditProductDetails editProductDetails) {
+        Product product = getById(id);
+        product.setName(editProductDetails.getProductName());
+        product.setPrice(editProductDetails.getPrice());
+        product.setCategory(editProductDetails.getCategory());
+        product.setQuantity(editProductDetails.getQuantity());
+        product.setDescription(editProductDetails.getDescription());
+        product.setAvailable(editProductDetails.getAvailable());
+        product.setPhoto(editProductDetails.getImage());
+
+        productsRepository.save(product);
     }
 }

@@ -3,6 +3,8 @@ package app.products.model;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.io.Serial;
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -13,7 +15,9 @@ import java.util.UUID;
 @AllArgsConstructor
 @Builder
 @Entity
-public class Product {
+public class Product implements Serializable {
+    @Serial
+    private final static long serialVersionUID = 1L;
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)

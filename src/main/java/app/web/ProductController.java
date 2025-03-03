@@ -8,15 +8,14 @@ import app.user.model.User;
 import app.user.service.UserService;
 import app.web.dto.AddAProductRequest;
 import app.web.dto.AdminSearchRequest;
+import app.web.dto.EditProductDetails;
+import app.web.mapper.DTOMapper;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
 import java.util.List;
@@ -80,7 +79,7 @@ public class ProductController {
         return modelAndView;
     }
     @GetMapping("/edit/search")
-    public ModelAndView editProductSearch(@Valid AdminSearchRequest adminSearchRequest,@AuthenticationPrincipal AuthenticationMetadata auth){
+    public ModelAndView editProductSearch(@Valid AdminSearchRequest adminSearchRequest, @AuthenticationPrincipal AuthenticationMetadata auth){
         User user = userService.getById(auth.getUserId());
         ModelAndView modelAndView = new ModelAndView("editProduct");
         modelAndView.addObject("user", user);
@@ -89,7 +88,26 @@ public class ProductController {
         modelAndView.addObject("search", search);
         return modelAndView;
     }
+    @GetMapping("/{id}/edit")
+    public ModelAndView loadSpecificProducts(@AuthenticationPrincipal AuthenticationMetadata auth, @PathVariable UUID id){
+        Product product= productsService.getById(id);
+        User user = userService.getById(auth.getUserId());
+        ModelAndView modelAndView = new ModelAndView("editProductDetails");
+        modelAndView.addObject("user", user);
+        modelAndView.addObject("product", product);
+        modelAndView.addObject("editProductDetails", DTOMapper.mapProductToProductEditDetails(product));
+        return modelAndView;
+    }
 
+    @PutMapping("/{id}/edit")
+    public String updateProduct(@PathVariable UUID id,@Valid EditProductDetails editProductDetails,BindingResult bindingResult ){
+        if(bindingResult.hasErrors()) {
+            return "editProduct";
+        }
+        productsService.updateProduct(id,editProductDetails);
+
+        return "redirect:/home";
+    }
     @GetMapping("/today-deals")
     public ModelAndView getTodayDeals(@AuthenticationPrincipal AuthenticationMetadata auth) {
         User user = userService.getById(auth.getUserId());

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,25 +8,24 @@
     <link rel="stylesheet" href="/css/home.css">
 </head>
 <body>
-    <header th:replace="fragments/common::nav"></header>
+    <header th:replace="fragments/common::nav(user=${user})"></header>
 
     <div class="product-detail-container">
         <div class="product-detail">
-            <img src="coke.pn" alt="Product Image" class="product-image">
+            <img th:src="${product.photo}" alt="Product Image" class="product-image">
             <div class="product-info">
-                <h1>Product Name</h1>
-                <p class="price">$25.99</p>
-                <p class="description">This is a detailed description of the product.</p>
-                <p class="category">Category: Drinks</p>
-                <p class="quantity">Available Quantity: 100</p>
-                <div id="successMessage" class="success-message">
-                    Item added to cart successfully!
-                </div>
+                <h1 th:text="${product.name}">Product Name</h1>
+                <p th:text="'$'+${product.price}" class="price"></p>
+                <p th:text="${product.description}" class="description"></p>
+                <p th:text="'Category: '+${product.category.name()}" class="category"></p>
+                <p th:text="'Available Quantity: '+${product.quantity}" class="quantity"> </p>
+<!--                <div id="successMessage" class="success-message">-->
+<!--                    Item added to cart successfully!-->
+<!--                </div>-->
                 <form action="">
                     <input type="hidden" name="productId" value="1">
                     <button type="submit" class="btn">Add to Cart</button>
                 </form>
-                <!-- <a href="cart.html" class="btn"></a> -->
             </div>
         </div>
     </div>

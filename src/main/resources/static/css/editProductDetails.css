@@ -74,12 +74,18 @@ textarea {
     display: inline-block;
     width: 50px;
     height: 25px;
+    pointer-events: auto;
 }
 
 .switch input {
     opacity: 0;
-    width: 0;
-    height: 0;
+    width: 50px;
+    height: 25px;
+    position: absolute;
+    left: 0;
+    top: 0;
+    cursor: pointer;
+    z-index: 2;
 }
 
 .slider {
