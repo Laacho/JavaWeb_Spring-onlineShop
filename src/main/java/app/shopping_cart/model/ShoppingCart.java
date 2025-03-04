@@ -27,7 +27,7 @@ public class ShoppingCart {
     @CollectionTable(name = "shopping_cart_products",joinColumns = @JoinColumn(name = "shopping_cart_id"))
     @MapKeyJoinColumn(name = "product_id")
     @Column(name = "quantity", nullable = false)
-    private Map<Product,Integer> products=new HashMap<>();
+    private Map<Product,Integer> products=new LinkedHashMap<>();
 
     @Column(nullable = false)
     private LocalDateTime addedAt;

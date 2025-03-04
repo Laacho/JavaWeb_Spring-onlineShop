@@ -1,6 +1,5 @@
 package app.user.service;
 
-import app.cloudinary.CloudinaryService;
 import app.exceptions.DomainException;
 import app.order_details.model.OrderDetails;
 import app.orders.model.Order;
@@ -14,6 +13,9 @@ import app.user.repository.UserRepository;
 import app.web.dto.EditProfileRequest;
 import app.web.dto.RegisterRequest;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -21,7 +23,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -42,7 +43,7 @@ public class UserService implements UserDetailsService {
 
     @Transactional
     public void register(RegisterRequest registerRequest) {
-        Optional<User> optionalUser = userRepository.findByUsernameOrAddress(registerRequest.getUsername(),registerRequest.getAddress());
+        Optional<User> optionalUser = userRepository.findByUsernameOrAddress(registerRequest.getUsername(), registerRequest.getAddress());
         if (optionalUser.isPresent()) {
             throw new DomainException("Username or password are incorrect");
         }
@@ -55,6 +56,7 @@ public class UserService implements UserDetailsService {
         user.setShoppingCart(shoppingCart);
         userRepository.save(user);
     }
+
     public User getById(UUID id) {
 
         return userRepository.findById(id)
@@ -62,11 +64,11 @@ public class UserService implements UserDetailsService {
     }
 
     public List<User> getAllByRole(UserRole role) {
-       return userRepository.findAllByRole(role);
+        return userRepository.findAllByRole(role);
     }
 
     @Transactional
-    public void initializeDefaultAdmin(RegisterRequest registerRequest){
+    public void initializeDefaultAdmin(RegisterRequest registerRequest) {
         LocalDateTime now = LocalDateTime.now();
         User defaultAdmin = User.builder()
                 .username(registerRequest.getUsername())
@@ -83,11 +85,11 @@ public class UserService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         User user = userRepository.findByUsername(username).orElseThrow(() -> new DomainException("User with this username does not exist."));
-        return new AuthenticationMetadata(user.getId(),username, user.getPassword(), user.getRole(), user.isActive());
+        return new AuthenticationMetadata(user.getId(), username, user.getPassword(), user.getRole(), user.isActive());
     }
 
     public List<Product> getMostOrderedProducts(List<Order> orders) {
-       return orders.stream()
+        return orders.stream()
                 .flatMap(order -> order.getOrderDetails().stream())
                 .collect(Collectors.groupingBy(
                         OrderDetails::getProduct,
@@ -98,6 +100,7 @@ public class UserService implements UserDetailsService {
                 .map(Map.Entry::getKey)
                 .collect(Collectors.toList());
     }
+
     public void editProfile(UUID userId, EditProfileRequest editProfileRequest) {
         User user = getById(userId);
         user.setProfilePicture(editProfileRequest.getProfilePicture());
@@ -117,17 +120,27 @@ public class UserService implements UserDetailsService {
         User user = getById(id);
         user.setActive(!user.isActive());
         userRepository.save(user);
+
+        updateSecurityContext(user);
     }
 
     public void switchRole(UUID id) {
         User user = getById(id);
-        if(user.getRole() == UserRole.USER) {
+        if (user.getRole() == UserRole.USER) {
             user.setRole(UserRole.ADMIN);
-        }
-        else{
+        } else {
             user.setRole(UserRole.USER);
         }
         userRepository.save(user);
+        updateSecurityContext(user);
+    }
+
+    private void updateSecurityContext(User user) {
+        UserDetails updatedUser = loadUserByUsername(user.getUsername());
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        UsernamePasswordAuthenticationToken newAuth = new UsernamePasswordAuthenticationToken(
+                updatedUser, authentication.getCredentials(), updatedUser.getAuthorities());
+        SecurityContextHolder.getContext().setAuthentication(newAuth);
     }
 
     private User initializeDefaultUser(RegisterRequest registerRequest) {
