@@ -37,7 +37,10 @@ public class Product implements Serializable {
     private Category category;
 
     @Column(nullable = false)
-    private int quantity;// smsl ako e krastavica da kaje che se prodavat 5 krastavici za gorniq price
+    private int quantityPerUnit;// smsl ako e krastavica da kaje che se prodavat 5 krastavici za gorniq price
+
+    @Column(nullable = false)
+    private int stockQuantity;
 
     private String description;
 

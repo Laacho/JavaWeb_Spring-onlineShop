@@ -29,8 +29,11 @@
                 <option th:each="category : ${T(app.products.model.Category).values()}" th:value="${category}" th:text="${category}" >Electronics</option>
             </select>
 
-            <label for="product-quantity">Quantity:</label>
-            <input type="number" id="product-quantity" value="50" th:field="*{quantity}">
+            <label for="product-quantity">Quantity per Unit:</label>
+            <input type="number" id="product-quantity" value="50" th:field="*{quantityPerUnit}">
+
+            <label for="stock-quantity">Stock quantity:</label>
+            <input type="number" id="stock-quantity" value="50" th:field="*{stockQuantity}">
 
             <label for="product-description">Description:</label>
             <textarea id="product-description" th:field="*{description}">This is a sample product description.</textarea>
@@ -47,7 +50,6 @@
             <label for="profile-pic-url">Profile Picture URL:</label>
             <input type="text" id="profile-pic-url" placeholder="Paste profile picture URL" value="profile.jpg" th:field="*{image}">
 
-            
             <button type="submit" class="save-btn">Save Changes</button>
         </form>
     </div>

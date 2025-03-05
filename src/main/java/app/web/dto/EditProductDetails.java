@@ -28,7 +28,11 @@ public class EditProductDetails {
 
     @NotNull(message = "Quantity cannot be null!")
     @Positive(message = "The quantity must be greater or equal to 0")
-    private int quantity;
+    private int quantityPerUnit;
+
+    @NotNull(message = "Quantity cannot be null!")
+    @Positive(message = "The quantity must be greater or equal to 0")
+    private int stockQuantity;
 
     @NotBlank(message = "Description cannot be empty!")
     @Size(min = 1,max=255,message = "Description must be between 1 and 255 characters!")

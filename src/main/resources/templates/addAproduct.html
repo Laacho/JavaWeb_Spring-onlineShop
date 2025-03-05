@@ -36,16 +36,19 @@
             <div th:if="${#fields.hasErrors('category')}" th:errors="*{category}" class="error-message" ></div>
 
             <!-- Quantity -->
-            <label for="quantity">Quantity</label>
-            <input type="number" id="quantity"  min="1" th:field="*{quantity}" required>
-            <div th:if="${#fields.hasErrors('quantity')}" th:errors="*{quantity}" class="error-message" ></div>
+            <label for="quantityPerUnit">Quantity per Unit</label>
+            <input type="number" id="quantityPerUnit"  min="1" th:field="*{quantityPerUnit}" required>
+            <div th:if="${#fields.hasErrors('quantityPerUnit')}" th:errors="*{quantityPerUnit}" class="error-message" ></div>
+
+            <label for="quantity">Stock Quantity</label>
+            <input type="number" id="quantity"  min="1" th:field="*{stockQuantity}" required>
+            <div th:if="${#fields.hasErrors('stockQuantity')}" th:errors="*{stockQuantity}" class="error-message" ></div>
 
             <!-- Description -->
             <label for="description">Product Description</label>
             <textarea id="description"  rows="4" th:field="*{description}" required></textarea>
             <div th:if="${#fields.hasErrors('description')}" th:errors="*{description}" class="error-message"></div>
 
-            <!-- Submit Button -->
             <button  class="btn">Add Product </button>
         </form>
     </div>
