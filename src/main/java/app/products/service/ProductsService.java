@@ -33,14 +33,14 @@ public class ProductsService {
         this.orderDetailsService = orderDetailsService;
     }
 
-    public void addAproduct(AddAProductRequest productRequest)  {
+    public void addAproduct(AddAProductRequest productRequest) {
         checkForUniqueProductName(productRequest.getProductName());
         Product product = initProduct(productRequest);
         productsRepository.save(product);
     }
 
     public List<Product> findAllProductsDependingOnRole(UserRole role) {
-        if(role==UserRole.ADMIN){
+        if (role == UserRole.ADMIN) {
             return productsRepository.findAll();
         }
         return productsRepository.findAllByIsAvailable(true);
@@ -50,17 +50,15 @@ public class ProductsService {
         User user = userService.getById(userId);
         //if the user is a new acount( no orders) give him the most ordered products
         //otherswise give him the most ordered of his items
-        if(user.getOrders().isEmpty()){
+        if (user.getOrders().isEmpty()) {
             return orderDetailsService.getMostOrderedProducts();
-        }
-        else{
+        } else {
             return userService.getMostOrderedProducts(user.getOrders());
         }
     }
 
 
-
-    public List<Product> search( AdminSearchRequest adminSearchRequest) {
+    public List<Product> search(AdminSearchRequest adminSearchRequest) {
         return productsRepository.findAllByNameContainingIgnoreCase(adminSearchRequest.getProductName());
     }
 
@@ -75,7 +73,8 @@ public class ProductsService {
                 .photo(productRequest.getProductImageURL())
                 .price(productRequest.getPrice())
                 .category(productRequest.getCategory())
-                .quantity(productRequest.getQuantity())
+                .quantityPerUnit(productRequest.getQuantityPerUnit())
+                .stockQuantity(productRequest.getStockQuantity())
                 .description(productRequest.getDescription())
                 .isAvailable(true)
                 .isOnDeal(false)
@@ -83,14 +82,6 @@ public class ProductsService {
                 .updatedAt(now)
                 .build();
     }
-
-    private void checkForUniqueProductName(String productName) {
-        Optional<Product> byName = productsRepository.findByName(productName);
-        if (byName.isPresent()) {
-            throw new DomainException("Product name already exists");
-        }
-    }
-
 
     public List<Product> searchByName(String productName) {
         return productsRepository.findByNameContainingIgnoreCase(productName);
@@ -101,11 +92,18 @@ public class ProductsService {
         product.setName(editProductDetails.getProductName());
         product.setPrice(editProductDetails.getPrice());
         product.setCategory(editProductDetails.getCategory());
-        product.setQuantity(editProductDetails.getQuantity());
+        //product.setQuantity(editProductDetails.getQuantity());
         product.setDescription(editProductDetails.getDescription());
         product.setAvailable(editProductDetails.getAvailable());
         product.setPhoto(editProductDetails.getImage());
 
         productsRepository.save(product);
+    }
+
+    private void checkForUniqueProductName(String productName) {
+        Optional<Product> byName = productsRepository.findByName(productName);
+        if (byName.isPresent()) {
+            throw new DomainException("Product name already exists");
+        }
     }
 }

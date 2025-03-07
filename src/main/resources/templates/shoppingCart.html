@@ -21,17 +21,33 @@
         <h2>Your Shopping Cart</h2>
         
         <!-- Cart Items List -->
-      <form action="">
+<!--      <form action="">-->
         <div class="cart-items">
             <div class="cart-item" th:each="map : ${user.shoppingCart.products}">
                 <img th:src="${map.key.photo}" alt="Product Image" class="product-pic">
                 <div class="cart-item-details">
                     <p class="product-name" th:text="${map.key.name}">Product Name</p>
-                    <p class="product-quantity" th:text="'Quantity: '+${map.value}">Quantity: 2</p>
+                    <div class="quantity-control">
+                        <!-- Decrease Quantity Button -->
+                        <form th:action="@{'/shopping-cart/'+${map.key.id}+'/decrease'}" th:method="POST">
+                            <input type="hidden" name="product_id" th:value="${map.key.id}">
+                            <button class="quantity-btn">➖</button>
+                        </form>
+
+                        <!-- Display Quantity -->
+                        <span class="quantity-value" th:text="${map.value}">1</span>
+
+                        <!-- Increase Quantity Button -->
+                        <form th:action="@{'/shopping-cart/'+${map.key.id}+'/increase'}" th:method="POST">
+                            <input type="hidden" name="product_id" th:value="${map.key.id}">
+                            <button class="quantity-btn">➕</button>
+                        </form>
+                    </div>
+<!--                    <p class="product-quantity" th:text="'Quantity: '+${map.value}">Quantity: 2</p>-->
                     <p class="product-price" th:text="'$'+${map.key.price}">$10.00</p>
                 </div>
-                <form th:action="@{'/shopping-cart/'+${map.key.id}+'/remove'}" th:method="DELETE">
-                    <input type="hidden" name="product_id" value="123"> 
+                <form th:action="@{'/shopping-cart/'+${map.key.id}+'/remove'}" th:method="POST">
+                    <input type="hidden" name="product_id" th:value="${map.key.id}">
                     <button class="remove-item">❌</button>
                 </form>
             </div>
@@ -39,24 +55,26 @@
 
         <!-- Voucher & Order Section -->
         <div class="cart-actions">
-            <form action="">
-            <input type="text" placeholder="Enter voucher code" class="voucher-input">
+            <form th:action="@{/shopping-cart/calculate}" th:method="PUT" th:object="${applyVoucherRequest}">
+            <input type="text" placeholder="Enter voucher code" class="voucher-input" th:field="*{voucherCode}" required>
             <button class="apply-voucher">Apply Voucher</button>
             </form>
         </div>
+          <div class="total-amount">
+              <h3 th:text="'Total: $' + ${#strings.isEmpty(totalAmount) ? '0.00':totalAmount}">Total: $50.00</h3>
+          </div>
 
         <div class="cart-buttons">
             <form th:action="@{'/shopping-cart/clear'}" th:method="DELETE">
                 <input type="hidden" name="cart_id" value="123">  
                 <button class="clear-cart">Clear Cart</button>
-                <!-- should redirect you to this <a href="orderHistory.html"></a> -->
             </form> 
             <form>
                 <input type="hidden" name="cart_id" value="123">  
                 <button class="order-now"> Order Now</button>
             </form>
         </div>
-      </form>
+<!--      </form>-->
     </div>
 </body>
 </html>
