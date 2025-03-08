@@ -61,11 +61,14 @@ public class ProductController {
     }
 
     @GetMapping("/{id}/details")
-    public ModelAndView getProductDetails(@PathVariable UUID id,@AuthenticationPrincipal AuthenticationMetadata auth) {
+    public ModelAndView getProductDetails(@PathVariable UUID id,@RequestParam(required = false,defaultValue = "false") boolean added,@AuthenticationPrincipal AuthenticationMetadata auth) {
         User user = userService.getById(auth.getUserId());
         Product product = productsService.getById(id);
         ModelAndView modelAndView = new ModelAndView("productDetails");
         modelAndView.addObject("user",user);
+        if(added) {
+            modelAndView.addObject("added", added);
+        }
         modelAndView.addObject("product", product);
         return modelAndView;
     }

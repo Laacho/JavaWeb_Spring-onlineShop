@@ -18,11 +18,11 @@
                 <p th:text="'$'+${product.price}" class="price"></p>
                 <p th:text="${product.description}" class="description"></p>
                 <p th:text="'Category: '+${product.category.name()}" class="category"></p>
-                <p th:text="'Available Quantity: '+${product.quantity}" class="quantity"> </p>
-<!--                <div id="successMessage" class="success-message">-->
-<!--                    Item added to cart successfully!-->
-<!--                </div>-->
-                <form action="">
+                <p th:text="'Available Quantity: '+${product.stockQuantity}" class="quantity"> </p>
+                <div id="successMessage" class="success-message" th:if="${added}">
+                    Item added to cart successfully!
+                </div>
+                <form th:action="@{'/shopping-cart/'+${product.id}}" th:method="POST">
                     <input type="hidden" name="productId" value="1">
                     <button type="submit" class="btn">Add to Cart</button>
                 </form>

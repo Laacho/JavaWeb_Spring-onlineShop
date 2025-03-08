@@ -42,11 +42,13 @@ public class ShoppingCartController {
         return modelAndView;
     }
 
-    @PostMapping("/{id}/{added}")
-    public ModelAndView addProductToShoppingCart(@PathVariable UUID id, @PathVariable boolean added, @AuthenticationPrincipal AuthenticationMetadata auth) {
-        added = shoppingCartService.addProductToCart(id, auth.getUserId());
-        ModelAndView modelAndView = new ModelAndView("redirect:/products/"+id+"/details");
-        modelAndView.addObject("added", added);
+    @PostMapping("/{id}")
+    public ModelAndView addProductToShoppingCart(@PathVariable UUID id,  @AuthenticationPrincipal AuthenticationMetadata auth) {
+        boolean added = shoppingCartService.addProductToCart(id, auth.getUserId());
+        ModelAndView modelAndView = new ModelAndView();
+        modelAndView.setViewName("redirect:/products/"+id+"/details?added="+added);
+        //maybe this: "redirect:/products/"+id+"/details"
+       // modelAndView.addObject("added", added);
         //todo finish logic when adding product
         //i mean displaying the label that is green
         return modelAndView;
@@ -72,6 +74,7 @@ public class ShoppingCartController {
     @PutMapping("/calculate")
     public ModelAndView calculate(@Valid ApplyVoucherRequest applyVoucherRequest, @AuthenticationPrincipal AuthenticationMetadata auth) {
         shoppingCartService.applyVoucher(applyVoucherRequest,auth.getUserId());
+        //todo finish
         return null;
     }
     @PostMapping("/{id}/decrease")

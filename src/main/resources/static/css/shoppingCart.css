@@ -52,20 +52,20 @@ body {
 
 /* Cart Item Details */
 .cart-item-details {
-    /*flex-grow: 1;*/
-    /*text-align: left;*/
-    /*padding: 0 20px;*/
-
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 20px; /* Space between elements */
+    gap: 20px;
     width: 100%;
 }
 
 .product-name {
     font-size: 20px;
     font-weight: bold;
+    flex:1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .product-quantity,
@@ -182,6 +182,8 @@ body {
     align-items: center;
     justify-content: center;
     gap: 10px;
+    min-width: 100px;
+    flex-shrink: 0;
 }
 
 .quantity-btn {
