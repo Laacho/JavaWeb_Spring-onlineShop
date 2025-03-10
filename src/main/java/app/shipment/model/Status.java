@@ -2,8 +2,7 @@ package app.shipment.model;
 
 public enum Status {
 
-    PROCESSING,
-    SHIPPED,
+    STARTED,
     OUT_FOR_DELIVERY,
     DELIVERED
 }

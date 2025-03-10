@@ -1,5 +1,8 @@
 package app.shopping_cart.service;
 
+import app.exceptions.DomainException;
+import app.orders.model.Order;
+import app.orders.service.OrderService;
 import app.products.model.Product;
 import app.products.service.ProductsService;
 import app.shopping_cart.model.ShoppingCart;
@@ -29,28 +32,29 @@ public class ShoppingCartService {
     private final ShoppingCartRepository shoppingCartRepository;
     private final VoucherService voucherService;
     private final UserRepository userRepository;
+    private final OrderService orderService;
 
     @Autowired
-    public ShoppingCartService(UserService userService, ProductsService productsService, ShoppingCartRepository shoppingCartRepository, VoucherService voucherService, UserRepository userRepository) {
+    public ShoppingCartService(UserService userService, ProductsService productsService, ShoppingCartRepository shoppingCartRepository, VoucherService voucherService, UserRepository userRepository, OrderService orderService) {
         this.userService = userService;
         this.productsService = productsService;
         this.shoppingCartRepository = shoppingCartRepository;
         this.voucherService = voucherService;
         this.userRepository = userRepository;
+        this.orderService = orderService;
     }
 
     public boolean addProductToCart(UUID productId, UUID userID) {
         Product productToAdd = productsService.getById(productId);
-        if(!productToAdd.isAvailable() || productToAdd.getStockQuantity()<=0){
+        if (!productToAdd.isAvailable() || productToAdd.getStockQuantity() <= 0) {
             return false;
         }
         User user = userService.getById(userID);
         ShoppingCart shoppingCart = user.getShoppingCart();
         Map<Product, Integer> products = shoppingCart.getProducts();
-        if(products.containsKey(productToAdd)) {
+        if (products.containsKey(productToAdd)) {
             products.put(productToAdd, products.get(productToAdd) + 1);
-        }
-        else {
+        } else {
             products.put(productToAdd, 1);
         }
         shoppingCart.setAddedAt(LocalDateTime.now());
@@ -75,23 +79,25 @@ public class ShoppingCartService {
         shoppingCartRepository.save(shoppingCart);
     }
 
-    public BigDecimal applyVoucher( ApplyVoucherRequest applyVoucherRequest, UUID userId) {
+    public BigDecimal applyVoucher(ApplyVoucherRequest applyVoucherRequest, UUID userId) {
         Voucher voucher = voucherService.findByCode(applyVoucherRequest.getVoucherCode());
+        UUID ownerId = voucher.getUser().getId();
+        if (!ownerId.equals(userId)) {
+            throw new DomainException("This voucher does not belong to you");
+        }
         LocalDateTime deadline = voucher.getDeadline();
-        if(deadline.isAfter(LocalDateTime.now())){
+        if (deadline.isBefore(LocalDateTime.now())) {
             //invalid voucher
             throw new RuntimeException("Voucher has expired");
         }
         //valid voucher and apply it
         BigDecimal orderSum = calculateOrderSum(userId);
         BigDecimal minOrderPrice = voucher.getMinOrderPrice();
-        if(orderSum.compareTo(minOrderPrice) < 0){
+        if (orderSum.compareTo(minOrderPrice) < 0) {
             throw new RuntimeException("Minimum order price is less than to order price");
         }
         BigDecimal discountAmount = voucher.getDiscountAmount();
-        BigDecimal finalOrderPrice = orderSum.subtract(discountAmount);
-        //todo
-        return finalOrderPrice;
+        return orderSum.subtract(discountAmount);
     }
 
     public BigDecimal calculateOrderSum(UUID userId) {
@@ -99,9 +105,17 @@ public class ShoppingCartService {
         Map<Product, Integer> products = user.getShoppingCart().getProducts();
         BigDecimal orderSum = BigDecimal.ZERO;
         for (Map.Entry<Product, Integer> kvp : products.entrySet()) {
-            BigDecimal price = kvp.getKey().getPrice();
-            Integer value = kvp.getValue();
-            orderSum=orderSum.add(price.multiply(BigDecimal.valueOf(value)));
+            Product product = kvp.getKey();
+            Integer amount = kvp.getValue();
+            if (product.isOnDeal()) {
+                BigDecimal discountAmount = product.getDiscountAmount();
+                BigDecimal finalPrice = product.getPrice().subtract(discountAmount);
+                orderSum=orderSum.add(
+                        finalPrice.multiply(BigDecimal.valueOf(amount))
+                );
+            } else {
+                orderSum = orderSum.add(product.getPrice().multiply(BigDecimal.valueOf(amount)));
+            }
         }
         return orderSum;
     }
@@ -119,6 +133,8 @@ public class ShoppingCartService {
                         LinkedHashMap::new
                 ));
         user.getShoppingCart().setProducts(collect);
+        //todo in this service there shouldnt be userRepository
+        //the userRepository should only be accessible through user service
         userRepository.save(user);
     }
 
@@ -127,7 +143,7 @@ public class ShoppingCartService {
         Product product = productsService.getById(id);
         Map<Product, Integer> products = user.getShoppingCart().getProducts();
         Integer amount = products.get(product);
-        if(amount == 1){
+        if (amount == 1) {
             return;
         }
         products.put(product, products.get(product) - 1);
@@ -145,5 +161,35 @@ public class ShoppingCartService {
         ShoppingCart shoppingCart = user.getShoppingCart();
         shoppingCart.setProducts(products);
         shoppingCartRepository.save(shoppingCart);
+    }
+
+    public Order placeOrder(BigDecimal totalAmount, UUID userId) {
+        User user = userService.getById(userId);
+        ShoppingCart shoppingCart = user.getShoppingCart();
+        Map<Product, Integer> products = shoppingCart.getProducts();
+        if (!checkIfPriceMatches(products, totalAmount)) {
+            throw new DomainException("Price do not match");
+        }
+        Order order = orderService.placeOrder(totalAmount, userId);
+        empty(userId);
+        return order;
+    }
+
+    private boolean checkIfPriceMatches(Map<Product, Integer> products, BigDecimal totalAmount) {
+        BigDecimal recalculatedTotal = BigDecimal.ZERO;
+        for (Map.Entry<Product, Integer> kvp : products.entrySet()) {
+            Product product = kvp.getKey();
+            if (product.isOnDeal()) {
+                BigDecimal discountAmount = product.getDiscountAmount();
+                BigDecimal productPrice = product.getPrice().subtract(discountAmount);
+                recalculatedTotal = recalculatedTotal.add(productPrice.multiply(BigDecimal.valueOf(kvp.getValue())));
+            } else {
+                recalculatedTotal = recalculatedTotal.add(product.getPrice()
+                        .multiply(
+                                BigDecimal.valueOf(
+                                        kvp.getValue())));
+            }
+        }
+        return totalAmount.compareTo(recalculatedTotal) == 0;
     }
 }

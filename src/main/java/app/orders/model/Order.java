@@ -36,6 +36,6 @@ public class Order {
     @Column(nullable = false)
     private BigDecimal totalPrice;
 
-    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL,fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "order",fetch = FetchType.EAGER)
     private List<OrderDetails> orderDetails=new ArrayList<>();
 }

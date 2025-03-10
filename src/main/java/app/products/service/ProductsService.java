@@ -66,6 +66,25 @@ public class ProductsService {
         return productsRepository.findById(id).orElseThrow(() -> new DomainException("Product not found"));
     }
 
+
+    public List<Product> searchByName(String productName) {
+        return productsRepository.findByNameContainingIgnoreCase(productName);
+    }
+
+    public void updateProduct(UUID id, EditProductDetails editProductDetails) {
+        Product product = getById(id);
+        product.setName(editProductDetails.getProductName());
+        product.setPrice(editProductDetails.getPrice());
+        product.setCategory(editProductDetails.getCategory());
+        product.setQuantityPerUnit(editProductDetails.getQuantityPerUnit());
+        product.setStockQuantity(editProductDetails.getStockQuantity());
+        product.setDescription(editProductDetails.getDescription());
+        product.setAvailable(editProductDetails.getAvailable());
+        product.setPhoto(editProductDetails.getImage());
+
+        productsRepository.save(product);
+    }
+
     private Product initProduct(AddAProductRequest productRequest) {
         LocalDateTime now = LocalDateTime.now();
         return Product.builder()
@@ -81,23 +100,6 @@ public class ProductsService {
                 .createdAt(now)
                 .updatedAt(now)
                 .build();
-    }
-
-    public List<Product> searchByName(String productName) {
-        return productsRepository.findByNameContainingIgnoreCase(productName);
-    }
-
-    public void updateProduct(UUID id, EditProductDetails editProductDetails) {
-        Product product = getById(id);
-        product.setName(editProductDetails.getProductName());
-        product.setPrice(editProductDetails.getPrice());
-        product.setCategory(editProductDetails.getCategory());
-        //product.setQuantity(editProductDetails.getQuantity());
-        product.setDescription(editProductDetails.getDescription());
-        product.setAvailable(editProductDetails.getAvailable());
-        product.setPhoto(editProductDetails.getImage());
-
-        productsRepository.save(product);
     }
 
     private void checkForUniqueProductName(String productName) {

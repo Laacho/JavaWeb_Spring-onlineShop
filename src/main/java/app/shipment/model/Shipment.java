@@ -25,12 +25,13 @@ public class Shipment {
 
     private String trackingNumber;
 
-    private String carrier;
+    @Enumerated(EnumType.STRING)
+    private Carrier carrier;
 
     @Column(nullable = false)
     private LocalDateTime estimatedDeliveryDate;
 
-    @Column(nullable = false)
+
     private LocalDateTime actualDeliveryDate;
 
     @Enumerated(EnumType.STRING)

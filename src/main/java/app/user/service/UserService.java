@@ -163,4 +163,8 @@ public class UserService implements UserDetailsService {
                 .addedAt(LocalDateTime.now())
                 .build();
     }
+
+    public long getOrdersForUser(UUID userId) {
+      return   userRepository.countByOrders_UserId(userId);
+    }
 }

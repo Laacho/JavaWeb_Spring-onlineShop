@@ -24,9 +24,9 @@
             <tbody>
                 <tr th:each="order : ${allOrdersForUser}">
                     <td th:text="${order.orderId}"></td>
-                    <td th:text="${order.totalPrice}">$25.99</td>
+                    <td th:text="'$'+${order.totalPrice}">$25.99</td>
                     <td th:text="${order.description}">2x Coca Cola, 1x Chips</td>
-                    <td th:text="${order.orderDate}">Today</td>
+                    <td th:text="${#temporals.format(order.orderDate,'dd MMM YYYY HH:mm')}">Today</td>
                 </tr>
             </tbody>
         </table>

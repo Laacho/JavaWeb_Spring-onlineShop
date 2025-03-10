@@ -17,4 +17,5 @@ public interface UserRepository extends JpaRepository<User, UUID> {
     Optional<User> findByUsername(String username);
     List<User> findAllByRole(UserRole role);
     List<User> findByProfilePictureNotContaining(String profilePicture);
+    long countByOrders_UserId(UUID userId);
 }
