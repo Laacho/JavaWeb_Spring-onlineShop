@@ -5,6 +5,7 @@ import app.order_details.repository.OrderDetailsRepository;
 import app.orders.model.Order;
 import app.orders.repository.OrdersRepository;
 import app.products.model.Product;
+import app.products.service.ProductsService;
 import app.shopping_cart.model.ShoppingCart;
 import app.user.model.User;
 import app.user.service.UserService;
@@ -24,12 +25,14 @@ public class OrderService {
     private final OrdersRepository ordersRepository;
     private final UserService userService;
     private final OrderDetailsRepository orderDetailsRepository;
+    private final ProductsService productsService;
 
     @Autowired
-    public OrderService(OrdersRepository ordersRepository, UserService userService, OrderDetailsRepository orderDetailsRepository) {
+    public OrderService(OrdersRepository ordersRepository, UserService userService, OrderDetailsRepository orderDetailsRepository, ProductsService productsService) {
         this.ordersRepository = ordersRepository;
         this.userService = userService;
         this.orderDetailsRepository = orderDetailsRepository;
+        this.productsService = productsService;
     }
 
 
@@ -51,6 +54,7 @@ public class OrderService {
                     .build();
             orderDetailsList.add(orderDetails);
         }
+        productsService.reduceItemQuantity(orderDetailsList);
         String description="You have successfully placed an order! Its now sent to shipment and will be arriving shortly!";
         Order order = Order.builder()
                 .user(user)
@@ -66,4 +70,6 @@ public class OrderService {
         }
         return order;
     }
+
+
 }

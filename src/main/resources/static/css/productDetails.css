@@ -75,3 +75,16 @@
     border: 1px solid #c6efce;
     background-color: #d9ead3;
 }
+
+
+.old-price {
+    font-size: 20px;
+    color: #888;
+    text-decoration: line-through;
+}
+
+.new-price {
+    font-size: 24px;
+    color: #0277bd;
+    font-weight: bold;
+}

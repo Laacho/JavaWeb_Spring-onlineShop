@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notifications</title>
+    <link rel="stylesheet" href="/css/home.css">
+    <link rel="stylesheet" href="/css/notifications.css">
+</head>
+<body>
+
+<header th:replace="fragments/common::nav(user=${user})"></header>
+
+<div class="notifications-container">
+    <!-- User View -->
+    <div class="user-notifications" th:if="${user.role.name()=='USER'}">
+        <h2>Your Notifications</h2>
+
+        <div class="notification-status">
+            <p>
+                Notifications are
+                <span th:text="${user.wantsNotifications} ? 'Enabled' : 'Disabled'"
+                      th:classappend="${user.wantsNotifications} ? 'status-enabled' : 'status-disabled'">
+                Enabled
+            </span>
+            </p>
+        </div>
+        <div class="notification-box">
+            <table>
+                <thead>
+                <tr>
+                    <th>Subject</th>
+                    <th>Body</th>
+                    <th>Date</th>
+                    <th>Status</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="notification : ${allUserNotifications}">
+                    <td th:text="${notification.subject}">Promotion</td>
+                    <td th:text="${notification.body}">Get 20% off your next order!</td>
+                    <td th:text="${#temporals.format(notification.createdOn,'dd MMM YYYY HH:mm')}">2025-03-10</td>
+                    <td th:text="${notification.status}">Enabled</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+
+        <div class="notification-actions">
+            <form th:method="PUT" th:action="@{/notifications}">
+            <button class="toggle-btn">Enable/Disable Notifications</button>
+            </form>
+            <form th:method="DELETE" th:action="@{/notifications}">
+                <button class="clear-btn">Clear All Notifications</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Admin View -->
+    <div class="admin-notifications" th:if="${user.role.name()=='ADMIN'}" >
+        <h2>Admin Notification Panel</h2>
+
+        <form class="admin-form" th:object="${sendNotificationRequest}" th:action="@{/notifications/publish}" th:method="POST">
+            <label for="notif-subject">Subject:</label>
+            <input type="text" id="notif-subject" placeholder="Enter subject" required th:field="*{subject}">
+
+            <label for="notif-body">Body:</label>
+            <textarea id="notif-body" placeholder="Enter message" required th:field="*{body}"></textarea>
+
+            <label for="notif-username">Username:</label>
+            <input type="text" id="notif-username" placeholder="Enter username (optional)" th:field="*{username}">
+
+
+
+            <button type="submit" class="send-btn">Send Notification</button>
+        </form>
+    </div>
+</div>
+
+</body>
+</html>

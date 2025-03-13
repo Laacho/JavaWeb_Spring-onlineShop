@@ -46,6 +46,7 @@ public class ShoppingCartService {
 
     public boolean addProductToCart(UUID productId, UUID userID) {
         Product productToAdd = productsService.getById(productId);
+        //check if the product the user wants to add is available in quantity
         if (!productToAdd.isAvailable() || productToAdd.getStockQuantity() <= 0) {
             return false;
         }
@@ -163,11 +164,16 @@ public class ShoppingCartService {
         shoppingCartRepository.save(shoppingCart);
     }
 
+    public Order placeOrder(BigDecimal totalAmount, UUID userId, String voucherCode) {
+        if (!checkIfPriceMatches(userId, totalAmount,voucherCode)) {
+            throw new DomainException("Price do not match");
+        }
+        Order order = orderService.placeOrder(totalAmount, userId);
+        empty(userId);
+        return order;
+    }
     public Order placeOrder(BigDecimal totalAmount, UUID userId) {
-        User user = userService.getById(userId);
-        ShoppingCart shoppingCart = user.getShoppingCart();
-        Map<Product, Integer> products = shoppingCart.getProducts();
-        if (!checkIfPriceMatches(products, totalAmount)) {
+        if (!checkIfPriceMatches(userId,totalAmount)) {
             throw new DomainException("Price do not match");
         }
         Order order = orderService.placeOrder(totalAmount, userId);
@@ -175,21 +181,16 @@ public class ShoppingCartService {
         return order;
     }
 
-    private boolean checkIfPriceMatches(Map<Product, Integer> products, BigDecimal totalAmount) {
-        BigDecimal recalculatedTotal = BigDecimal.ZERO;
-        for (Map.Entry<Product, Integer> kvp : products.entrySet()) {
-            Product product = kvp.getKey();
-            if (product.isOnDeal()) {
-                BigDecimal discountAmount = product.getDiscountAmount();
-                BigDecimal productPrice = product.getPrice().subtract(discountAmount);
-                recalculatedTotal = recalculatedTotal.add(productPrice.multiply(BigDecimal.valueOf(kvp.getValue())));
-            } else {
-                recalculatedTotal = recalculatedTotal.add(product.getPrice()
-                        .multiply(
-                                BigDecimal.valueOf(
-                                        kvp.getValue())));
-            }
-        }
+    private boolean checkIfPriceMatches(UUID userId, BigDecimal totalAmount, String voucherCode) {
+        ApplyVoucherRequest applyVoucherRequest=new ApplyVoucherRequest();
+        applyVoucherRequest.setVoucherCode(voucherCode);
+
+        BigDecimal finalAmount = applyVoucher(applyVoucherRequest, userId);
+
+        return totalAmount.compareTo(finalAmount) == 0;
+    }
+    private boolean checkIfPriceMatches(UUID userId,  BigDecimal totalAmount) {
+        BigDecimal recalculatedTotal = calculateOrderSum(userId);
         return totalAmount.compareTo(recalculatedTotal) == 0;
     }
 }

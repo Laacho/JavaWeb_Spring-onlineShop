@@ -24,6 +24,9 @@
               <a th:href="@{'/user/'+${user.id}+'/profile'}" class="profile-link">
               <img th:src="${#strings.isEmpty(user.profilePicture) ? '/images/user.png' : user.profilePicture}" alt="Profile" class="icon">
               </a>
+              <a th:href="@{/notifications}" class="notification-button">
+                <img src="/images/notification-bell.png" alt="Notifications" class="icon">
+              </a>
               <a th:href="@{/shopping-cart}" class="cart-button">
                 <img src="/images/cart.png" alt="Cart" class="icon">
               </a>

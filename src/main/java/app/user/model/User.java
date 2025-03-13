@@ -54,6 +54,9 @@ public class User {
     @Column(nullable = false)
     private LocalDateTime updatedAt;
 
+    @Column(nullable = false)
+    private boolean wantsNotifications;
+
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL,orphanRemoval = true,fetch = FetchType.EAGER)
     private List<Voucher> vouchers=new ArrayList<>();
 

@@ -1,8 +1,11 @@
 package app.products.service;
 
+import app.notifications.service.NotificationService;
 import app.products.model.Product;
-import app.products.repository.ProductsRepository;
+import app.web.dto.SendNotificationRequest;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -13,27 +16,31 @@ import java.util.List;
 import java.util.Random;
 
 @Service
+@Slf4j
 public class DealsService {
 
-    private final ProductsRepository productsRepository;
+    private final ProductsService productsService;
+    private final NotificationService notificationService;
     private static final int DEAL_COUNT = 8;
 
     @Autowired
-    public DealsService(ProductsRepository productsRepository) {
-        this.productsRepository = productsRepository;
+    public DealsService(ProductsService productsService, NotificationService notificationService) {
+        this.productsService = productsService;
+        this.notificationService = notificationService;
     }
 
     @Scheduled(cron = "@daily")
     @Transactional
     public void generateDailyDeals() {
-        productsRepository.removeAllDeals();
-        List<Product> all = productsRepository.findAll();
+        productsService.removeAllDeals();
+        List<Product> all = productsService.findAll();
         List<Product> products = pickRandomDeals(all);
-        productsRepository.saveAll(products);
+        productsService.saveAll(products);
+        sendNotificationToALL(products);
     }
 
     public List<Product> getDailyDeals() {
-        return productsRepository.findByIsOnDeal(true);
+       return productsService.findAllProductsOnDeal();
     }
 
 
@@ -63,5 +70,31 @@ public class DealsService {
     private double generateRandomDiscount() {
         Random random = new Random();
         return 10 + (40 * random.nextDouble());
+    }
+    private void sendNotificationToALL(List<Product> products) {
+        SendNotificationRequest sendNotificationRequest = buildRequest(products);
+        ResponseEntity<Void> voidResponseEntity = notificationService.publishNotificationToAllUsers(sendNotificationRequest);
+        if (!voidResponseEntity.getStatusCode().is2xxSuccessful()) {
+            log.error("[Feign call to notification-svc failed].Couldn't send notification to all users");
+        }
+    }
+
+    private SendNotificationRequest buildRequest(List<Product> products) {
+        SendNotificationRequest sendNotificationRequest=new SendNotificationRequest();
+        sendNotificationRequest.setSubject("New deals available");
+        StringBuilder sb=new StringBuilder();
+        sb.append("""
+                Discount Alert!
+                The following products are on discount today:
+                
+                """);
+        for (Product product : products) {
+            sb.append("\n");
+            sb.append(product.getName()).append(" with Category: ");
+            sb.append(product.getCategory());
+        }
+        sb.append("Head over to the Today's Deals tab and check them out!");
+        sendNotificationRequest.setBody(sb.toString());
+        return sendNotificationRequest;
     }
 }

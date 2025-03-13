@@ -15,10 +15,13 @@
             <img th:src="${product.photo}" alt="Product Image" class="product-image">
             <div class="product-info">
                 <h1 th:text="${product.name}">Product Name</h1>
-                <p th:text="'$'+${product.price}" class="price"></p>
                 <p th:text="${product.description}" class="description"></p>
                 <p th:text="'Category: '+${product.category.name()}" class="category"></p>
                 <p th:text="'Available Quantity: '+${product.stockQuantity}" class="quantity"> </p>
+
+                <p th:text="'$'+${product.price}"  th:classappend="${product.onDeal ? 'old-price' : 'price'}"></p>
+                <p th:if="${product.onDeal}" class="new-price" th:text="'$'+${product.price.subtract(product.discountAmount)}"></p>
+
                 <div id="successMessage" class="success-message" th:if="${added}">
                     Item added to cart successfully!
                 </div>

@@ -20,6 +20,7 @@ h1 {
     align-items: center;
     padding: 8px 20px;
     height: 80px;
+    flex-wrap: nowrap;
 }
 
 .navbar .logo {
@@ -30,7 +31,7 @@ h1 {
 
 .nav-links {
     display: flex;
-    gap: 20px;
+    gap: 10px;
 }
 
 .nav-links a {
@@ -55,9 +56,11 @@ h1 {
     display: flex;
     gap: 20px;
     align-items: center;
+    justify-content: center;
+    flex-wrap: nowrap;
 }
 
-.profile-link, .cart-button {
+.profile-link, .cart-button, .notification-button {
     color: white;
     text-decoration: none;
     font-weight: bold;
@@ -65,9 +68,11 @@ h1 {
     border-radius: 5px;
     display: flex;
     align-items: center;
+    justify-content: center; /* Center icons */
+    position: relative;
 }
 
-.profile-link:hover, .cart-button:hover {
+.profile-link:hover, .cart-button:hover, .notification-button:hover  {
     background-color: #01579b;
 }
 
@@ -76,7 +81,20 @@ h1 {
     width: 26px;
     height: 26px;
 }
-
+.notification-button {
+    position: relative;
+}
+.badge {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    background: red;
+    color: white;
+    font-size: 12px;
+    font-weight: bold;
+    padding: 4px 6px;
+    border-radius: 50%;
+}
 /* Product Display */
 .products-container {
     display: flex;

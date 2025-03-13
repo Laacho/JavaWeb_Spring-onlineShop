@@ -15,14 +15,13 @@
         <p class="sale-banner">Limited Time Offers - Grab them before they're gone!</p>
 
         <div class="deals-grid">
-            <!-- Product 1 -->
             <div class="deal-card" th:each="product :${dailyDeals}">
                 <span class="sale-badge">On Sale</span>
                 <img th:src="${product.photo}" alt="Coca Cola" class="deal-image">
                 <h3 th:text="${product.name}">Coca Cola</h3>
                 <p class="old-price" th:text="${product.price}"></p>
                 <p class="new-price" th:text="'$'+${product.price.subtract(product.discountAmount)}"></p>
-                <form action="/add-to-cart" method="post">
+                <form th:action="@{'/shopping-cart/'+${product.id}}" th:method="POST">
                     <input type="hidden" name="productId" value="2">
                     <button type="submit" class="btn">Add to Cart</button>
                 </form>

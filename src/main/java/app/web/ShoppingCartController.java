@@ -1,7 +1,7 @@
 package app.web;
 
+import app.notifications.service.NotificationService;
 import app.orders.model.Order;
-import app.products.service.ProductsService;
 import app.security.AuthenticationMetadata;
 import app.shipment.service.ShipmentService;
 import app.shopping_cart.service.ShoppingCartService;
@@ -9,6 +9,7 @@ import app.user.model.User;
 import app.user.service.UserService;
 import app.voucher.service.VoucherService;
 import app.web.dto.ApplyVoucherRequest;
+import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -23,29 +24,37 @@ import java.util.UUID;
 @Controller
 @RequestMapping("/shopping-cart")
 public class ShoppingCartController {
+
     private final ShoppingCartService shoppingCartService;
-    private final ProductsService productsService;
     private final UserService userService;
     private final ShipmentService shipmentService;
     private final VoucherService voucherService;
-
+    private final NotificationService notificationService;
+    private boolean voucherUsed;
+    private String voucherCode;
     @Autowired
-    public ShoppingCartController(ShoppingCartService shoppingCartService, ProductsService productsService, UserService userService, ShipmentService shipmentService, VoucherService voucherService) {
+    public ShoppingCartController(ShoppingCartService shoppingCartService, UserService userService, ShipmentService shipmentService, VoucherService voucherService, NotificationService notificationService) {
         this.shoppingCartService = shoppingCartService;
-        this.productsService = productsService;
         this.userService = userService;
         this.shipmentService = shipmentService;
         this.voucherService = voucherService;
+        this.notificationService = notificationService;
+        voucherUsed= false;
     }
 
     @GetMapping
-    public ModelAndView getShoppingCart(@AuthenticationPrincipal AuthenticationMetadata auth) {
+    public ModelAndView getShoppingCart(@RequestParam(required = false) BigDecimal totalAmount,HttpSession session,@AuthenticationPrincipal AuthenticationMetadata auth) {
         shoppingCartService.sortProducts(auth.getUserId());
         ModelAndView modelAndView = new ModelAndView("shoppingCart");
         User user = userService.getById(auth.getUserId());
         modelAndView.addObject("user", user);
         modelAndView.addObject("applyVoucherRequest",new ApplyVoucherRequest());
-        BigDecimal totalAmount = shoppingCartService.calculateOrderSum(auth.getUserId());
+        if(totalAmount == null) {
+            totalAmount = (BigDecimal) session.getAttribute("totalAmount");
+            if(totalAmount == null) {
+                totalAmount = shoppingCartService.calculateOrderSum(auth.getUserId());
+            }
+        }
         modelAndView.addObject("totalAmount",totalAmount);
         return modelAndView;
     }
@@ -55,10 +64,6 @@ public class ShoppingCartController {
         boolean added = shoppingCartService.addProductToCart(id, auth.getUserId());
         ModelAndView modelAndView = new ModelAndView();
         modelAndView.setViewName("redirect:/products/"+id+"/details?added="+added);
-        //maybe this: "redirect:/products/"+id+"/details"
-       // modelAndView.addObject("added", added);
-        //todo finish logic when adding product
-        //i mean displaying the label that is green
         return modelAndView;
     }
 
@@ -80,7 +85,7 @@ public class ShoppingCartController {
         return modelAndView;
     }
     @PutMapping("/calculate")
-    public ModelAndView calculate(@Valid ApplyVoucherRequest applyVoucherRequest, BindingResult bindingResult, @AuthenticationPrincipal AuthenticationMetadata auth) {
+    public ModelAndView calculate(@Valid ApplyVoucherRequest applyVoucherRequest, BindingResult bindingResult, HttpSession session, @AuthenticationPrincipal AuthenticationMetadata auth) {
         User user = userService.getById(auth.getUserId());
         if(bindingResult.hasErrors()){
             ModelAndView modelAndView = new ModelAndView();
@@ -89,8 +94,12 @@ public class ShoppingCartController {
             return modelAndView;
         }
         BigDecimal totalAmount = shoppingCartService.applyVoucher(applyVoucherRequest, auth.getUserId());
+        session.setAttribute("totalAmount", totalAmount);
         ModelAndView modelAndView = new ModelAndView("redirect:/shopping-cart");
-        modelAndView.addObject("totalAmount",totalAmount);
+        voucherUsed=true;
+        voucherCode=applyVoucherRequest.getVoucherCode();
+       // redirectAttributes.addFlashAttribute("totalAmount", totalAmount);
+       modelAndView.addObject("totalAmount",totalAmount);
         modelAndView.addObject("user", user);
         return modelAndView;
     }
@@ -115,13 +124,21 @@ public class ShoppingCartController {
     @PostMapping("/order")
     public ModelAndView order(@RequestParam BigDecimal totalAmount,@AuthenticationPrincipal AuthenticationMetadata auth) {
         User user = userService.getById(auth.getUserId());
-        Order order = shoppingCartService.placeOrder(totalAmount, auth.getUserId());
+        Order order;
+        if(voucherUsed){
+            order = shoppingCartService.placeOrder(totalAmount, auth.getUserId(),voucherCode);
+        }
+        else {
+            order = shoppingCartService.placeOrder(totalAmount, auth.getUserId());
+        }
         String trackingNumber = shipmentService.startShipping(order);
         voucherService.checkForGivingVoucher(auth.getUserId());
-        //todo
-        //post notification with the tracking number
+        notificationService.sendNotificationWithTrackingNumber(trackingNumber,auth.getUserId());
+        voucherUsed=false;
         ModelAndView modelAndView = new ModelAndView("redirect:/shipment");
         modelAndView.addObject("user", user);
         return modelAndView;
     }
+
+
 }

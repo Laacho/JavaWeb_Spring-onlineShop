@@ -62,6 +62,9 @@ public class UserService implements UserDetailsService {
         return userRepository.findById(id)
                 .orElseThrow(() -> new DomainException("User with id [%s] does not exist.".formatted(id)));
     }
+    public User getByUsername(String username) {
+        return userRepository.findByUsername(username).orElseThrow(() -> new DomainException("User with name [%s] does not exist.".formatted(username)));
+    }
 
     public List<User> getAllByRole(UserRole role) {
         return userRepository.findAllByRole(role);
@@ -77,6 +80,7 @@ public class UserService implements UserDetailsService {
                 .role(UserRole.ADMIN)
                 .isActive(true)
                 .createdAt(now)
+                .wantsNotifications(false)
                 .updatedAt(now)
                 .build();
         userRepository.save(defaultAdmin);
@@ -152,6 +156,7 @@ public class UserService implements UserDetailsService {
                 .role(UserRole.USER)
                 .isActive(true)
                 .createdAt(now)
+                .wantsNotifications(true)
                 .updatedAt(now)
                 .build();
     }
@@ -159,12 +164,19 @@ public class UserService implements UserDetailsService {
     private ShoppingCart initShoppingCart(User user) {
         return ShoppingCart.builder()
                 .user(user)
-                .products(new HashMap<>())
+                .products(new LinkedHashMap<>())
                 .addedAt(LocalDateTime.now())
                 .build();
     }
 
     public long getOrdersForUser(UUID userId) {
       return   userRepository.countByOrders_UserId(userId);
+    }
+
+    public void changeNotifications(UUID userId) {
+        User user = getById(userId);
+        boolean wantsNotifications = user.isWantsNotifications();
+        user.setWantsNotifications(!wantsNotifications);
+        userRepository.save(user);
     }
 }
