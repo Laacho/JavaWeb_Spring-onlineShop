@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -12,22 +12,22 @@
 
     <div class="shipment-container">
         <h2>Track Your Shipment</h2>
-        <form id="tracking-form">
+        <form th:method="GET" th:action="@{/shipment/tracking}">
             <label for="tracking-number">Enter Tracking Number:</label>
             <input type="text" id="tracking-number" name="tracking-number" required>
             <button type="submit" class="btn">Track Shipment</button>
         </form>
 
-        <div id="shipment-result" class="hidden">
+        <div id="shipment-result"  th:if="${shipment!=null}">
             <h3>Shipment Details</h3>
-            <p><strong>Carrier:</strong> <span id="carrier"></span></p>
-            <p><strong>Estimated Delivery:</strong> <span id="delivery-date"></span></p>
-            <p><strong>Status:</strong> <span id="status"></span></p>
-            <p><strong>Shipment Price:</strong> $<span id="shipment-price"></span></p>
-            <p><strong>Order Details:</strong> <span id="order-details"></span></p>
+            <p><strong>Carrier:</strong> <span id="carrier" th:text="${shipment.carrier.name()}"></span></p>
+            <p><strong>Estimated Delivery:</strong> <span id="delivery-date" th:text="${#temporals.format(shipment.estimatedDeliveryDate,'dd MMM YYYY HH:mm')}"></span></p>
+            <p><strong>Status:</strong> <span id="status" th:text="${shipment.status.name()}"></span></p>
+            <p><strong>Shipment Price:</strong> $<span id="shipment-price" th:text="${shipment.shipmentPrice}"></span></p>
+            <p><strong>Order Details:</strong> <span id="order-details" th:text="${shipment.order.orderId}"></span></p>
         </div>
 
-        <div id="shipment-error" class="hidden">
+        <div id="shipment-error"  th:if="${noShipment}">
             <p class="error-message">No shipment found for this tracking number.</p>
         </div>
     </div>

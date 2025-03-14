@@ -2,6 +2,7 @@ package app.products.service;
 
 
 import app.exceptions.DomainException;
+import app.order_details.model.OrderDetails;
 import app.order_details.service.OrderDetailsService;
 import app.products.model.Product;
 import app.products.repository.ProductsRepository;
@@ -57,7 +58,6 @@ public class ProductsService {
         }
     }
 
-
     public List<Product> search(AdminSearchRequest adminSearchRequest) {
         return productsRepository.findAllByNameContainingIgnoreCase(adminSearchRequest.getProductName());
     }
@@ -66,10 +66,14 @@ public class ProductsService {
         return productsRepository.findById(id).orElseThrow(() -> new DomainException("Product not found"));
     }
 
+    public Product getByName(String name) {
+        return productsRepository.findByName(name).orElseThrow(() -> new DomainException("Product not found"));
+    }
 
     public List<Product> searchByName(String productName) {
         return productsRepository.findByNameContainingIgnoreCase(productName);
     }
+
 
     public void updateProduct(UUID id, EditProductDetails editProductDetails) {
         Product product = getById(id);
@@ -107,5 +111,31 @@ public class ProductsService {
         if (byName.isPresent()) {
             throw new DomainException("Product name already exists");
         }
+    }
+
+    public void reduceItemQuantity(List<OrderDetails> orderDetailsList) {
+        for (OrderDetails orderDetails : orderDetailsList) {
+            Product product = orderDetails.getProduct();
+            int quantity = orderDetails.getQuantity();
+            // Product byName = productsService.getByName(product.getName());
+            product.setStockQuantity(product.getStockQuantity() - quantity);
+            productsRepository.save(product);
+        }
+    }
+
+    public void removeAllDeals() {
+        productsRepository.removeAllDeals();
+    }
+
+    public List<Product> findAll() {
+        return productsRepository.findAll();
+    }
+
+    public void saveAll(List<Product> products) {
+        productsRepository.saveAll(products);
+    }
+
+    public List<Product> findAllProductsOnDeal() {
+        return productsRepository.findByIsOnDeal(true);
     }
 }

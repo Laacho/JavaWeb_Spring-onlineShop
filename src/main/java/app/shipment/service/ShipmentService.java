@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.Optional;
 import java.util.Random;
 
 @Service
@@ -36,6 +37,9 @@ public class ShipmentService {
                 .build();
         shipmentRepository.save(shipment);
         return trackingNumber;
+    }
+    public Optional<Shipment> findByTrackingNumber(String trackingNumber) {
+        return shipmentRepository.findByTrackingNumber(trackingNumber);
     }
 
     private String generateTrackingNumber() {
