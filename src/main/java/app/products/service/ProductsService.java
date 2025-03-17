@@ -66,9 +66,6 @@ public class ProductsService {
         return productsRepository.findById(id).orElseThrow(() -> new DomainException("Product not found"));
     }
 
-    public Product getByName(String name) {
-        return productsRepository.findByName(name).orElseThrow(() -> new DomainException("Product not found"));
-    }
 
     public List<Product> searchByName(String productName) {
         return productsRepository.findByNameContainingIgnoreCase(productName);
@@ -117,7 +114,6 @@ public class ProductsService {
         for (OrderDetails orderDetails : orderDetailsList) {
             Product product = orderDetails.getProduct();
             int quantity = orderDetails.getQuantity();
-            // Product byName = productsService.getByName(product.getName());
             product.setStockQuantity(product.getStockQuantity() - quantity);
             productsRepository.save(product);
         }

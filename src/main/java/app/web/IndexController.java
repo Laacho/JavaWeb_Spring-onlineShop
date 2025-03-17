@@ -18,7 +18,6 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.List;
 
@@ -70,7 +69,9 @@ public class IndexController {
 
 
     @GetMapping("/home")
-    public ModelAndView getHomePage(@RequestParam (value = "productName", required = false) String productName, @AuthenticationPrincipal AuthenticationMetadata auth, @ModelAttribute("searchedProducts") List<Product> searchedProducts) {
+    public ModelAndView getHomePage(@RequestParam (value = "productName", required = false) String productName,
+                                    @AuthenticationPrincipal AuthenticationMetadata auth,
+                                    @ModelAttribute("searchedProducts") List<Product> searchedProducts) {
         User user = userService.getById(auth.getUserId());
 
         ModelAndView modelAndView = new ModelAndView("home");

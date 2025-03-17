@@ -8,7 +8,6 @@ import app.products.service.ProductsService;
 import app.shopping_cart.model.ShoppingCart;
 import app.shopping_cart.repository.ShoppingCartRepository;
 import app.user.model.User;
-import app.user.repository.UserRepository;
 import app.user.service.UserService;
 import app.voucher.model.Voucher;
 import app.voucher.service.VoucherService;
@@ -31,16 +30,14 @@ public class ShoppingCartService {
     private final ProductsService productsService;
     private final ShoppingCartRepository shoppingCartRepository;
     private final VoucherService voucherService;
-    private final UserRepository userRepository;
     private final OrderService orderService;
 
     @Autowired
-    public ShoppingCartService(UserService userService, ProductsService productsService, ShoppingCartRepository shoppingCartRepository, VoucherService voucherService, UserRepository userRepository, OrderService orderService) {
+    public ShoppingCartService(UserService userService, ProductsService productsService, ShoppingCartRepository shoppingCartRepository, VoucherService voucherService,  OrderService orderService) {
         this.userService = userService;
         this.productsService = productsService;
         this.shoppingCartRepository = shoppingCartRepository;
         this.voucherService = voucherService;
-        this.userRepository = userRepository;
         this.orderService = orderService;
     }
 
@@ -134,9 +131,7 @@ public class ShoppingCartService {
                         LinkedHashMap::new
                 ));
         user.getShoppingCart().setProducts(collect);
-        //todo in this service there shouldnt be userRepository
-        //the userRepository should only be accessible through user service
-        userRepository.save(user);
+        userService.save(user);
     }
 
     public void decrementItemQuantity(UUID id, UUID userId) {
@@ -180,7 +175,14 @@ public class ShoppingCartService {
         empty(userId);
         return order;
     }
-
+    public ShoppingCart initShoppingCart(User user) {
+        ShoppingCart shoppingCart = ShoppingCart.builder()
+                .user(user)
+                .products(new LinkedHashMap<>())
+                .addedAt(LocalDateTime.now())
+                .build();
+        return shoppingCartRepository.save(shoppingCart);
+    }
     private boolean checkIfPriceMatches(UUID userId, BigDecimal totalAmount, String voucherCode) {
         ApplyVoucherRequest applyVoucherRequest=new ApplyVoucherRequest();
         applyVoucherRequest.setVoucherCode(voucherCode);
@@ -193,4 +195,6 @@ public class ShoppingCartService {
         BigDecimal recalculatedTotal = calculateOrderSum(userId);
         return totalAmount.compareTo(recalculatedTotal) == 0;
     }
+
+
 }

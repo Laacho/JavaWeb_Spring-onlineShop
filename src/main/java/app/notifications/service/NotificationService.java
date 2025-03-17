@@ -20,6 +20,7 @@ import java.util.UUID;
 public class NotificationService {
     private final NotificationClient notificationClient;
     private final UserService userService;
+    private static final int MAX_NUMBER_OF_NOTIFICATIONS_TO_BE_DISPLAYED = 15;
 
     public NotificationService(NotificationClient notificationClient, UserService userService) {
         this.notificationClient = notificationClient;
@@ -92,7 +93,7 @@ public class NotificationService {
         }
         return Objects.requireNonNull(notificationHistory.getBody())
                 .stream()
-                .limit(15)
+                .limit(MAX_NUMBER_OF_NOTIFICATIONS_TO_BE_DISPLAYED)
                 .toList();
     }
 

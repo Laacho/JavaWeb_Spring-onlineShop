@@ -6,7 +6,7 @@ import app.orders.model.Order;
 import app.products.model.Product;
 import app.security.AuthenticationMetadata;
 import app.shopping_cart.model.ShoppingCart;
-import app.shopping_cart.repository.ShoppingCartRepository;
+import app.shopping_cart.service.ShoppingCartService;
 import app.user.model.User;
 import app.user.model.UserRole;
 import app.user.repository.UserRepository;
@@ -32,13 +32,13 @@ public class UserService implements UserDetailsService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
-    private final ShoppingCartRepository shoppingCartRepository;
+    private final ShoppingCartService shoppingCartService;
 
     @Autowired
-    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, ShoppingCartRepository shoppingCartRepository) {
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, ShoppingCartService shoppingCartService) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
-        this.shoppingCartRepository = shoppingCartRepository;
+        this.shoppingCartService = shoppingCartService;
     }
 
     @Transactional
@@ -50,9 +50,8 @@ public class UserService implements UserDetailsService {
         User user = initializeDefaultUser(registerRequest);
         userRepository.save(user);
 
-        ShoppingCart shoppingCart = initShoppingCart(user);
+        ShoppingCart shoppingCart = shoppingCartService.initShoppingCart(user);
 
-        shoppingCartRepository.save(shoppingCart);
         user.setShoppingCart(shoppingCart);
         userRepository.save(user);
     }
@@ -62,6 +61,7 @@ public class UserService implements UserDetailsService {
         return userRepository.findById(id)
                 .orElseThrow(() -> new DomainException("User with id [%s] does not exist.".formatted(id)));
     }
+
     public User getByUsername(String username) {
         return userRepository.findByUsername(username).orElseThrow(() -> new DomainException("User with name [%s] does not exist.".formatted(username)));
     }
@@ -88,7 +88,7 @@ public class UserService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user = userRepository.findByUsername(username).orElseThrow(() -> new DomainException("User with this username does not exist."));
+        User user = getByUsername(username);
         return new AuthenticationMetadata(user.getId(), username, user.getPassword(), user.getRole(), user.isActive());
     }
 
@@ -139,6 +139,21 @@ public class UserService implements UserDetailsService {
         updateSecurityContext(user);
     }
 
+    public long getOrdersForUser(UUID userId) {
+        return userRepository.countByOrders_UserId(userId);
+    }
+
+    public void changeNotifications(UUID userId) {
+        User user = getById(userId);
+        boolean wantsNotifications = user.isWantsNotifications();
+        user.setWantsNotifications(!wantsNotifications);
+        userRepository.save(user);
+    }
+
+    public void save(User user) {
+        userRepository.save(user);
+    }
+
     private void updateSecurityContext(User user) {
         UserDetails updatedUser = loadUserByUsername(user.getUsername());
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -159,24 +174,5 @@ public class UserService implements UserDetailsService {
                 .wantsNotifications(true)
                 .updatedAt(now)
                 .build();
-    }
-
-    private ShoppingCart initShoppingCart(User user) {
-        return ShoppingCart.builder()
-                .user(user)
-                .products(new LinkedHashMap<>())
-                .addedAt(LocalDateTime.now())
-                .build();
-    }
-
-    public long getOrdersForUser(UUID userId) {
-      return   userRepository.countByOrders_UserId(userId);
-    }
-
-    public void changeNotifications(UUID userId) {
-        User user = getById(userId);
-        boolean wantsNotifications = user.isWantsNotifications();
-        user.setWantsNotifications(!wantsNotifications);
-        userRepository.save(user);
     }
 }

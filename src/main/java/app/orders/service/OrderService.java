@@ -6,7 +6,6 @@ import app.orders.model.Order;
 import app.orders.repository.OrdersRepository;
 import app.products.model.Product;
 import app.products.service.ProductsService;
-import app.shopping_cart.model.ShoppingCart;
 import app.user.model.User;
 import app.user.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,8 +41,7 @@ public class OrderService {
 
     public Order placeOrder(BigDecimal totalAmount, UUID userId) {
         User user = userService.getById(userId);
-        ShoppingCart shoppingCart = user.getShoppingCart();
-        Map<Product, Integer> products = shoppingCart.getProducts();
+        Map<Product, Integer> products = user.getShoppingCart().getProducts();
         List<OrderDetails> orderDetailsList = new ArrayList<>();
         for (Map.Entry<Product, Integer> kvp : products.entrySet()) {
             Product product = kvp.getKey();
