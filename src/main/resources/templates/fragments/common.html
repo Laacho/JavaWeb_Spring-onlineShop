@@ -15,13 +15,13 @@
               <a th:href="@{/vouchers}"> My vouchers</a>
               <a th:href="@{/products/today-deals}">Today's Deals</a>
 
-              <a th:if="${user.role.name()=='ADMIN'}" th:href="@{/products/add}"> Add product</a>
-              <a th:if="${user.role.name()=='ADMIN'}" th:href="@{/products/edit}"> Edit product</a>
-              <a  th:if="${user.role.name()=='ADMIN'}" th:href="@{/user/all}"> All users</a>
+              <a sec:authorize="hasRole('ADMIN')" th:href="@{/products/add}"> Add product</a>
+              <a sec:authorize="hasRole('ADMIN')" th:href="@{/products/edit}"> Edit product</a>
+              <a sec:authorize="hasRole('ADMIN')" th:href="@{/user/all}"> All users</a>
 
             </div>
             <div class="profile-cart">
-              <a th:href="@{'/user/'+${user.id}+'/profile'}" class="profile-link">
+              <a th:href="@{'/user/'+${user.id}+'/profile'}"  class="profile-link">
               <img th:src="${#strings.isEmpty(user.profilePicture) ? '/images/user.png' : user.profilePicture}" alt="Profile" class="icon">
               </a>
               <a th:href="@{/notifications}" class="notification-button">

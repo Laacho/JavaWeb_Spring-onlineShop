@@ -1,5 +1,7 @@
 package app.shopping_cart.service;
 
+import app.event.ShoppingCartCreated;
+import app.event.UserRegistered;
 import app.exceptions.DomainException;
 import app.orders.model.Order;
 import app.orders.service.OrderService;
@@ -13,15 +15,15 @@ import app.voucher.model.Voucher;
 import app.voucher.service.VoucherService;
 import app.web.dto.ApplyVoucherRequest;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Service
 public class ShoppingCartService {
@@ -31,14 +33,16 @@ public class ShoppingCartService {
     private final ShoppingCartRepository shoppingCartRepository;
     private final VoucherService voucherService;
     private final OrderService orderService;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Autowired
-    public ShoppingCartService(UserService userService, ProductsService productsService, ShoppingCartRepository shoppingCartRepository, VoucherService voucherService,  OrderService orderService) {
+    public ShoppingCartService(UserService userService, ProductsService productsService, ShoppingCartRepository shoppingCartRepository, VoucherService voucherService, OrderService orderService, ApplicationEventPublisher eventPublisher) {
         this.userService = userService;
         this.productsService = productsService;
         this.shoppingCartRepository = shoppingCartRepository;
         this.voucherService = voucherService;
         this.orderService = orderService;
+        this.eventPublisher = eventPublisher;
     }
 
     public boolean addProductToCart(UUID productId, UUID userID) {
@@ -86,13 +90,13 @@ public class ShoppingCartService {
         LocalDateTime deadline = voucher.getDeadline();
         if (deadline.isBefore(LocalDateTime.now())) {
             //invalid voucher
-            throw new RuntimeException("Voucher has expired");
+            throw new DomainException("Voucher has expired");
         }
         //valid voucher and apply it
         BigDecimal orderSum = calculateOrderSum(userId);
         BigDecimal minOrderPrice = voucher.getMinOrderPrice();
         if (orderSum.compareTo(minOrderPrice) < 0) {
-            throw new RuntimeException("Minimum order price is less than to order price");
+            throw new DomainException("Minimum order price is less than to order price");
         }
         BigDecimal discountAmount = voucher.getDiscountAmount();
         return orderSum.subtract(discountAmount);
@@ -118,21 +122,7 @@ public class ShoppingCartService {
         return orderSum;
     }
 
-    public void sortProducts(UUID userId) {
-        User user = userService.getById(userId);
-        Map<Product, Integer> collect = user.getShoppingCart().getProducts()
-                .entrySet()
-                .stream()
-                .sorted(Comparator.comparing(entry -> entry.getKey().getName())) // Sort by timestamp
-                .collect(Collectors.toMap(
-                        Map.Entry::getKey,
-                        Map.Entry::getValue,
-                        (e1, e2) -> e1,
-                        LinkedHashMap::new
-                ));
-        user.getShoppingCart().setProducts(collect);
-        userService.save(user);
-    }
+
 
     public void decrementItemQuantity(UUID id, UUID userId) {
         User user = userService.getById(userId);
@@ -175,6 +165,7 @@ public class ShoppingCartService {
         empty(userId);
         return order;
     }
+
     public ShoppingCart initShoppingCart(User user) {
         ShoppingCart shoppingCart = ShoppingCart.builder()
                 .user(user)
@@ -182,6 +173,12 @@ public class ShoppingCartService {
                 .addedAt(LocalDateTime.now())
                 .build();
         return shoppingCartRepository.save(shoppingCart);
+    }
+    @EventListener
+    private void handleUserRegisteredEvent(UserRegistered event) {
+        ShoppingCart shoppingCart = initShoppingCart(event.getUser());
+        ShoppingCartCreated shoppingCartCreated = new ShoppingCartCreated(shoppingCart);
+        eventPublisher.publishEvent(shoppingCartCreated);
     }
     private boolean checkIfPriceMatches(UUID userId, BigDecimal totalAmount, String voucherCode) {
         ApplyVoucherRequest applyVoucherRequest=new ApplyVoucherRequest();

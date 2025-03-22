@@ -1,5 +1,7 @@
 package app.user.service;
 
+import app.event.ShoppingCartCreated;
+import app.event.UserRegistered;
 import app.exceptions.DomainException;
 import app.order_details.model.OrderDetails;
 import app.orders.model.Order;
@@ -13,6 +15,9 @@ import app.user.repository.UserRepository;
 import app.web.dto.EditProfileRequest;
 import app.web.dto.RegisterRequest;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.context.event.EventListener;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -22,6 +27,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -32,15 +38,15 @@ public class UserService implements UserDetailsService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
-    private final ShoppingCartService shoppingCartService;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Autowired
-    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, ShoppingCartService shoppingCartService) {
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, ApplicationEventPublisher eventPublisher) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
-        this.shoppingCartService = shoppingCartService;
+        this.eventPublisher = eventPublisher;
     }
-
+//na interview kaji sa circular dependency
     @Transactional
     public void register(RegisterRequest registerRequest) {
         Optional<User> optionalUser = userRepository.findByUsernameOrAddress(registerRequest.getUsername(), registerRequest.getAddress());
@@ -49,13 +55,9 @@ public class UserService implements UserDetailsService {
         }
         User user = initializeDefaultUser(registerRequest);
         userRepository.save(user);
-
-        ShoppingCart shoppingCart = shoppingCartService.initShoppingCart(user);
-
-        user.setShoppingCart(shoppingCart);
-        userRepository.save(user);
+        UserRegistered userRegistered = new UserRegistered(user);
+        eventPublisher.publishEvent(userRegistered);
     }
-
     public User getById(UUID id) {
 
         return userRepository.findById(id)
@@ -107,13 +109,17 @@ public class UserService implements UserDetailsService {
 
     public void editProfile(UUID userId, EditProfileRequest editProfileRequest) {
         User user = getById(userId);
-        user.setProfilePicture(editProfileRequest.getProfilePicture());
-        user.setAddress(editProfileRequest.getAddress());
-        user.setEmail(editProfileRequest.getEmail());
+       if(StringUtils.hasText(editProfileRequest.getAddress())) {
+           user.setAddress(editProfileRequest.getAddress());
+       }
+       if(StringUtils.hasText(editProfileRequest.getEmail())) {
+           user.setEmail(editProfileRequest.getEmail());
+       }
         user.setFirstName(editProfileRequest.getFirstName());
         user.setLastName(editProfileRequest.getLastName());
-
+        user.setProfilePicture(editProfileRequest.getProfilePicture());
         userRepository.save(user);
+
     }
 
     public List<User> getAllUsers() {
@@ -150,10 +156,12 @@ public class UserService implements UserDetailsService {
         userRepository.save(user);
     }
 
-    public void save(User user) {
+    @EventListener
+    protected void handleShoppingCartCreated(ShoppingCartCreated shoppingCartCreated){
+        User user = getById(shoppingCartCreated.getShoppingCart().getUser().getId());
+        user.setShoppingCart(shoppingCartCreated.getShoppingCart());
         userRepository.save(user);
     }
-
     private void updateSecurityContext(User user) {
         UserDetails updatedUser = loadUserByUsername(user.getUsername());
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
