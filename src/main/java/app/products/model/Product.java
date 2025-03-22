@@ -44,10 +44,10 @@ public class Product implements Serializable {
 
     private String description;
 
-    private boolean isAvailable;
+    private boolean available;
 
     @Column(nullable = false)
-    private boolean isOnDeal;
+    private boolean onDeal;
 
     private BigDecimal discountAmount;
 

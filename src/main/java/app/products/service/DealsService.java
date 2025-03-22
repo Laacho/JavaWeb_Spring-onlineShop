@@ -73,8 +73,12 @@ public class DealsService {
     }
     private void sendNotificationToALL(List<Product> products) {
         SendNotificationRequest sendNotificationRequest = buildRequest(products);
-        ResponseEntity<Void> voidResponseEntity = notificationService.publishNotificationToAllUsers(sendNotificationRequest);
-        if (!voidResponseEntity.getStatusCode().is2xxSuccessful()) {
+        try {
+            ResponseEntity<Void> voidResponseEntity = notificationService.publishNotificationToAllUsers(sendNotificationRequest);
+            if (!voidResponseEntity.getStatusCode().is2xxSuccessful()) {
+                log.error("[Feign call to notification-svc failed].Couldn't send notification to all users");
+            }
+        }catch (Exception e) {
             log.error("[Feign call to notification-svc failed].Couldn't send notification to all users");
         }
     }

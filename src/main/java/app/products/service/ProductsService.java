@@ -34,7 +34,7 @@ public class ProductsService {
         this.orderDetailsService = orderDetailsService;
     }
 
-    public void addAproduct(AddAProductRequest productRequest) {
+    public void addAProduct(AddAProductRequest productRequest) {
         checkForUniqueProductName(productRequest.getProductName());
         Product product = initProduct(productRequest);
         productsRepository.save(product);
@@ -44,7 +44,7 @@ public class ProductsService {
         if (role == UserRole.ADMIN) {
             return productsRepository.findAll();
         }
-        return productsRepository.findAllByIsAvailable(true);
+        return productsRepository.findAllByAvailable(true);
     }
 
     public List<Product> getRecommendedProductsForUser(UUID userId) {
@@ -96,8 +96,8 @@ public class ProductsService {
                 .quantityPerUnit(productRequest.getQuantityPerUnit())
                 .stockQuantity(productRequest.getStockQuantity())
                 .description(productRequest.getDescription())
-                .isAvailable(true)
-                .isOnDeal(false)
+                .available(true)
+                .onDeal(false)
                 .createdAt(now)
                 .updatedAt(now)
                 .build();
@@ -132,6 +132,6 @@ public class ProductsService {
     }
 
     public List<Product> findAllProductsOnDeal() {
-        return productsRepository.findByIsOnDeal(true);
+        return productsRepository.findAllByOnDealTrue();
     }
 }

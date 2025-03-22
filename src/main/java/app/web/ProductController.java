@@ -12,6 +12,7 @@ import app.web.dto.EditProductDetails;
 import app.web.mapper.DTOMapper;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
@@ -37,7 +38,7 @@ public class ProductController {
 
 
     @GetMapping("/add")
-//    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ModelAndView addProduct(@AuthenticationPrincipal AuthenticationMetadata auth) {
         User user=userService.getById(auth.getUserId());
         ModelAndView modelAndView = new ModelAndView("addAproduct");
@@ -54,7 +55,7 @@ public class ProductController {
             modelAndView.addObject("user", user);
             return modelAndView;
         }
-        productsService.addAproduct(addAProductRequest);
+        productsService.addAProduct(addAProductRequest);
         ModelAndView modelAndView = new ModelAndView("redirect:/home");
         modelAndView.addObject("user", user);
         return modelAndView;
@@ -74,6 +75,7 @@ public class ProductController {
     }
 
     @GetMapping("/edit")
+    @PreAuthorize("hasRole('ADMIN')")
     public ModelAndView getEditProductPage(@AuthenticationPrincipal AuthenticationMetadata auth){
         User user = userService.getById(auth.getUserId());
         ModelAndView modelAndView = new ModelAndView("editProduct");
@@ -82,6 +84,7 @@ public class ProductController {
         return modelAndView;
     }
     @GetMapping("/edit/search")
+    @PreAuthorize("hasRole('ADMIN')")
     public ModelAndView editProductSearch(@Valid AdminSearchRequest adminSearchRequest, @AuthenticationPrincipal AuthenticationMetadata auth){
         User user = userService.getById(auth.getUserId());
         ModelAndView modelAndView = new ModelAndView("editProduct");
@@ -92,6 +95,7 @@ public class ProductController {
         return modelAndView;
     }
     @GetMapping("/{id}/edit")
+    @PreAuthorize("hasRole('ADMIN')")
     public ModelAndView loadSpecificProducts(@AuthenticationPrincipal AuthenticationMetadata auth, @PathVariable UUID id){
         Product product= productsService.getById(id);
         User user = userService.getById(auth.getUserId());
@@ -116,7 +120,7 @@ public class ProductController {
         User user = userService.getById(auth.getUserId());
         ModelAndView modelAndView = new ModelAndView("todaysDeals");
         modelAndView.addObject("user", user);
-       List<Product> dailyDeals= dealsService.getDailyDeals();
+        List<Product> dailyDeals= dealsService.getDailyDeals();
         modelAndView.addObject("dailyDeals", dailyDeals);
         return modelAndView;
     }

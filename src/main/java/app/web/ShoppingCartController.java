@@ -7,6 +7,7 @@ import app.shipment.service.ShipmentService;
 import app.shopping_cart.service.ShoppingCartService;
 import app.user.model.User;
 import app.user.service.UserService;
+import app.util.ProductUtility;
 import app.voucher.service.VoucherService;
 import app.web.dto.ApplyVoucherRequest;
 import jakarta.servlet.http.HttpSession;
@@ -44,9 +45,9 @@ public class ShoppingCartController {
 
     @GetMapping
     public ModelAndView getShoppingCart(@RequestParam(required = false) BigDecimal totalAmount,HttpSession session,@AuthenticationPrincipal AuthenticationMetadata auth) {
-        shoppingCartService.sortProducts(auth.getUserId());
         ModelAndView modelAndView = new ModelAndView("shoppingCart");
         User user = userService.getById(auth.getUserId());
+        ProductUtility.sortProductsByUser(user);
         modelAndView.addObject("user", user);
         modelAndView.addObject("applyVoucherRequest",new ApplyVoucherRequest());
         if(totalAmount == null) {

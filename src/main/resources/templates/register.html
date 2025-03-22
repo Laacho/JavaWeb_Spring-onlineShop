@@ -8,16 +8,18 @@
 <body>
     <div class="container">
         <h1>Register</h1>
-        <form th:action="@{/register}" method="post">
+        <form th:action="@{/register}" method="post" th:object="${registerRequest}">
             <label for="username">Username</label>
-            <input placeholder="Username" type="text" id="username" name="username" class="wide-input" required>
-            
+            <input placeholder="Username" type="text" id="username" name="username" class="wide-input"  th:field="*{username}">
+            <div th:if="${#fields.hasErrors('username')}" class="error-message" th:errors="*{username}"></div>
             <label for="password">Password</label>
-            <input placeholder="Password" type="password" id="password" name="password" class="wide-input" required>
-            
+            <input placeholder="Password" type="password" id="password" name="password" class="wide-input"  th:field="*{password}">
+            <div th:if="${#fields.hasErrors('password')}" class="error-message" th:errors="*{password}"></div>
+
             <label for="address">Address</label>
-            <input placeholder="Address" type="text" id="address" name="address" class="wide-input" required>
-            
+            <input placeholder="Address" type="text" id="address" name="address" class="wide-input" th:field="*{address}">
+            <div th:if="${#fields.hasErrors('address')}" class="error-message" th:errors="*{address}"></div>
+
             
             <button type="submit" class="btn">Register</button>
         

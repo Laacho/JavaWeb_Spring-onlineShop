@@ -24,13 +24,13 @@ public class UserInit implements CommandLineRunner {
     @Override
     public void run(String... args) throws Exception {
         //checking for min 1 admin
-       List<User> allByRole = userService.getAllByRole(UserRole.ADMIN);
+        List<User> allByRole = userService.getAllByRole(UserRole.ADMIN);
         if(allByRole.isEmpty()) {
-            RegisterRequest registerRequest =new RegisterRequest();
-                registerRequest.setUsername("admin");
-                registerRequest.setPassword("admin");
-                registerRequest.setAddress("ONLINE SHOP CENTRAL");
-
+            RegisterRequest registerRequest = RegisterRequest.builder()
+                    .username("admin")
+                    .password("admin")
+                    .address("ONLINE SHOP CENTRAL")
+                    .build();
            userService.initializeDefaultAdmin(registerRequest);
        }
     }

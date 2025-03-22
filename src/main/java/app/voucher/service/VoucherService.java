@@ -40,7 +40,7 @@ public class VoucherService {
         if(ordersForUser % 5== 0 && ordersForUser > 0) {
             Voucher voucher = initVoucherForUser(userId);
             //add logic for notification
-
+            //todo
         }
     }
 

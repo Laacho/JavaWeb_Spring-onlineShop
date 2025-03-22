@@ -10,10 +10,10 @@
         <h1>Login</h1>
         <form th:action="@{/login}" method="post">
             <label for="username">Username</label>
-            <input placeholder="Username" type="text" id="username" name="username" class="wide-input" required>
+            <input placeholder="Username" type="text" id="username" name="username" class="wide-input" >
             
             <label for="password">Password</label>
-            <input placeholder="Password" type="password" id="password" name="password" class="wide-input" required>
+            <input placeholder="Password" type="password" id="password" name="password" class="wide-input" >
             <p th:if="${error}" th:text="${error}" class="error-message"></p>
             <button type="submit" class="btn">Login</button>
         </form>
