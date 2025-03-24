@@ -23,18 +23,18 @@ public class AddAProductRequest {
     private String productImageURL;
 
     @NotNull(message = "Price cannot be empty")
-    @Positive(message = "Must a value greater or equal to 0")
+    @Positive(message = "Must a value greater then 0")
     private BigDecimal price;
 
     @NotNull(message = "Must be a valid category")
     private Category category;
 
     @NotNull(message = "Quantity cannot be null!")
-    @Positive(message = "The quantity must be greater or equal to 0")
+    @Positive(message = "The quantity must be greater then 0")
     private int quantityPerUnit;
 
     @NotNull(message = "Quantity cannot be null!")
-    @Positive(message = "The quantity must be greater or equal to 0")
+    @Positive(message = "The quantity must be greater then 0")
     private int stockQuantity;
 
     @NotBlank(message = "Description cannot be empty!")

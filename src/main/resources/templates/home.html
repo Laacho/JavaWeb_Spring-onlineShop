@@ -27,7 +27,15 @@
         <div class="recommended-products">
             <div class="recommended-product" th:each="product : ${recommendedProducts}">
                 <img th:src="${product.photo}" alt="Coca Cola">
-                <p th:text="${product.name}+' - $'+${product.price}">Coca Cola - $2.99</p>
+<!--                <p th:text="${product.name}+' - $'+${product.price}">Coca Cola - $2.99</p>-->
+                <p>
+                    <span class="product-name" th:text="${product.name}"></span> -
+                    <span th:if="${!product.onDeal}" class="product-price" th:text="'$' + ${product.price}"></span>
+                    <span th:if="${product.onDeal}" class="product-price"
+                      th:text="'$'+${product.price.subtract(product.discountAmount)}"></span>
+
+                </p>
+
                 <a th:href="@{'/products/'+${product.id}+'/details'}" class="btn">View Details</a>
             </div>
         </div>

@@ -15,38 +15,38 @@
         <form class="product-form"  th:action="@{/products/add}"  th:method="POST" th:object="${addAProductRequest}">
             <!-- Product Name -->
             <label for="name">Product Name</label>
-            <input type="text" id="name" th:field="*{productName}" required>
+            <input type="text" id="name" th:field="*{productName}" >
             <div th:if="${#fields.hasErrors('productName')}" th:errors="*{productName}" class="error-message"></div>
 
             <!-- Photo URL -->
             <label for="photo">Product Image URL</label>
-            <input type="text" id="photo" th:field="*{productImageURL}" required>
+            <input type="text" id="photo" th:field="*{productImageURL}" >
             <div th:if="${#fields.hasErrors('productImageURL')}" th:errors="*{productImageURL}" class="error-message" ></div>
 
             <!-- Price -->
             <label for="price">Price ($)</label>
-            <input type="number" id="price" step="0.01" th:field="*{price}" required>
+            <input type="number" id="price" step="0.01" th:field="*{price}" >
             <div th:if="${#fields.hasErrors('price')}" th:errors="*{price}" class="error-message" ></div>
 
             <!-- Category -->
             <label for="category">Category</label>
-            <select id="category"  th:field="*{category}" required>
+            <select id="category"  th:field="*{category}" >
                 <option th:each="category : ${T(app.products.model.Category).values()}" th:value="${category}" th:text="${#strings.capitalize(#strings.toLowerCase(category))}"></option>
             </select>
             <div th:if="${#fields.hasErrors('category')}" th:errors="*{category}" class="error-message" ></div>
 
             <!-- Quantity -->
             <label for="quantityPerUnit">Quantity per Unit</label>
-            <input type="number" id="quantityPerUnit"  min="1" th:field="*{quantityPerUnit}" required>
+            <input type="number" id="quantityPerUnit"   th:field="*{quantityPerUnit}" >
             <div th:if="${#fields.hasErrors('quantityPerUnit')}" th:errors="*{quantityPerUnit}" class="error-message" ></div>
 
             <label for="quantity">Stock Quantity</label>
-            <input type="number" id="quantity"  min="1" th:field="*{stockQuantity}" required>
+            <input type="number" id="quantity"   th:field="*{stockQuantity}" >
             <div th:if="${#fields.hasErrors('stockQuantity')}" th:errors="*{stockQuantity}" class="error-message" ></div>
 
             <!-- Description -->
             <label for="description">Product Description</label>
-            <textarea id="description"  rows="4" th:field="*{description}" required></textarea>
+            <textarea id="description"  rows="4" th:field="*{description}" ></textarea>
             <div th:if="${#fields.hasErrors('description')}" th:errors="*{description}" class="error-message"></div>
 
             <button  class="btn">Add Product </button>

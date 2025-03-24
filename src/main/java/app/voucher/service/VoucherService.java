@@ -1,11 +1,14 @@
 package app.voucher.service;
 
+import app.notifications.service.NotificationService;
 import app.user.model.User;
 import app.user.service.UserService;
 import app.voucher.model.Voucher;
 import app.voucher.repository.VoucherRepository;
+import app.web.dto.SendNotificationRequest;
 import org.apache.commons.lang.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -16,11 +19,13 @@ import java.util.UUID;
 public class VoucherService {
     private final UserService userService;
     private final VoucherRepository voucherRepository;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Autowired
-    public VoucherService(UserService userService, VoucherRepository voucherRepository) {
+    public VoucherService(UserService userService, VoucherRepository voucherRepository,ApplicationEventPublisher eventPublisher) {
         this.userService = userService;
         this.voucherRepository = voucherRepository;
+        this.eventPublisher = eventPublisher;
     }
 
 
@@ -39,8 +44,7 @@ public class VoucherService {
         //could be changed
         if(ordersForUser % 5== 0 && ordersForUser > 0) {
             Voucher voucher = initVoucherForUser(userId);
-            //add logic for notification
-            //todo
+            eventPublisher.publishEvent(voucher);
         }
     }
 

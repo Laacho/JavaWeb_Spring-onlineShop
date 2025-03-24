@@ -1,13 +1,16 @@
 package app.notifications.service;
 
+import app.exceptions.NotificationFeignClientNotWorkingException;
 import app.notifications.client.NotificationClient;
 import app.notifications.client.dto.CreateNotificationRequest;
 import app.notifications.client.dto.NotificationResponse;
 import app.notifications.client.dto.SendNotificationForAll;
 import app.user.model.User;
 import app.user.service.UserService;
+import app.voucher.model.Voucher;
 import app.web.dto.SendNotificationRequest;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.event.EventListener;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
@@ -37,10 +40,13 @@ public class NotificationService {
                 .status("SUCCEEDED")
                 .build();
 
-
-        ResponseEntity<NotificationResponse> notificationResponseResponseEntity = notificationClient.publishNotification(request);
-        if (!notificationResponseResponseEntity.getStatusCode().is2xxSuccessful()) {
-            log.error("[Feign call to notification-svc failed] Couldn't post notification for user with id [%s]".formatted(userId));
+        try {
+            ResponseEntity<NotificationResponse> notificationResponseResponseEntity = notificationClient.publishNotification(request);
+            if (!notificationResponseResponseEntity.getStatusCode().is2xxSuccessful()) {
+                log.error("[Feign call to notification-svc failed] Couldn't post notification for user with id [%s]".formatted(userId));
+            }
+        } catch (Exception e) {
+            throw new NotificationFeignClientNotWorkingException("Error sending notification!");
         }
     }
 
@@ -51,28 +57,10 @@ public class NotificationService {
             publishNotificationForSpecificUser(sendNotificationRequest);
         } else {
             //username is blank so send to everyone
-            ResponseEntity<Void> notificationResponseResponseEntity = publishNotificationToAllUsers(sendNotificationRequest);
-            if (!notificationResponseResponseEntity.getStatusCode().is2xxSuccessful()) {
-                log.error("[Feign call to notification-svc failed].Couldn't send notification to all users");
-            }
+            publishNotificationToAllUsers(sendNotificationRequest);
         }
     }
 
-    private void publishNotificationForSpecificUser(SendNotificationRequest sendNotificationRequest) {
-        User user = userService.getByUsername(sendNotificationRequest.getUsername());
-
-        CreateNotificationRequest succeeded = CreateNotificationRequest.builder()
-                .body(sendNotificationRequest.getBody())
-                .status(sendNotificationRequest.getSubject())
-                .userId(user.getId())
-                .status("SUCCEEDED")
-                .build();
-        ResponseEntity<NotificationResponse> notificationResponseResponseEntity = notificationClient.publishNotification(succeeded);
-        if (!notificationResponseResponseEntity.getStatusCode().is2xxSuccessful()) {
-            log.error("[Feign call to notification-svc failed] Couldn't post notification for user with id [%s]".formatted(user.getId()));
-
-        }
-    }
 
     public ResponseEntity<Void> publishNotificationToAllUsers(SendNotificationRequest sendNotificationRequest) {
         List<UUID> userId = userService.getAllUsers().stream().map(User::getId).toList();
@@ -82,25 +70,72 @@ public class NotificationService {
                 .status("SUCCEEDED")
                 .userId(userId)
                 .build();
-        return notificationClient.publishNotificationForAll(request);
+        try {
+            ResponseEntity<Void> voidResponseEntity = notificationClient.publishNotificationForAll(request);
+            if (!voidResponseEntity.getStatusCode().is2xxSuccessful()) {
+                log.error("Failed to send notification for all users");
+            }
+            return voidResponseEntity;
+        } catch (Exception e) {
+            throw new NotificationFeignClientNotWorkingException("Error sending notification for all users");
+        }
 
     }
 
     public List<NotificationResponse> getAllUserNotifications(UUID id) {
-        ResponseEntity<List<NotificationResponse>> notificationHistory = notificationClient.getNotificationHistory(id);
-        if (!notificationHistory.getStatusCode().is2xxSuccessful()) {
-            log.error("[Feign call to notification-svc failed] Couldn't get notification for user with id [%s]".formatted(id));
+        try {
+            ResponseEntity<List<NotificationResponse>> notificationHistory = notificationClient.getNotificationHistory(id);
+            if (!notificationHistory.getStatusCode().is2xxSuccessful()) {
+                log.error("[Feign call to notification-svc failed] Couldn't get notification for user with id [%s]".formatted(id));
+            }
+            return Objects.requireNonNull(notificationHistory.getBody())
+                    .stream()
+                    .limit(MAX_NUMBER_OF_NOTIFICATIONS_TO_BE_DISPLAYED)
+                    .toList();
+        } catch (Exception e) {
+            throw new NotificationFeignClientNotWorkingException("Error getting notification for user with id [%s]".formatted(id));
         }
-        return Objects.requireNonNull(notificationHistory.getBody())
-                .stream()
-                .limit(MAX_NUMBER_OF_NOTIFICATIONS_TO_BE_DISPLAYED)
-                .toList();
+
     }
 
     public void deleteNotifications(UUID userId) {
-        ResponseEntity<Void> voidResponseEntity = notificationClient.deleteNotification(userId);
-        if (!voidResponseEntity.getStatusCode().is2xxSuccessful()) {
-            log.error("[Feign call to notification-svc failed] Couldn't delete notification for user with id [%s]".formatted(userId));
+        try {
+            ResponseEntity<Void> voidResponseEntity = notificationClient.deleteNotification(userId);
+            if (!voidResponseEntity.getStatusCode().is2xxSuccessful()) {
+                log.error("[Feign call to notification-svc failed] Couldn't delete notification for user with id [%s]".formatted(userId));
+            }
+        } catch (Exception e) {
+            log.error("Error deleting the notification for user with id [%s]".formatted(userId));
+        }
+    }
+    @EventListener
+    private void handleVoucherCreationEvent(Voucher voucher) {
+        String subject="You have a new voucher!";
+        String body= "%s has reached 5 orders. You can use this voucher code on your next purchase: %s!".formatted(voucher.getUser().getUsername(), voucher.getCode());
+        SendNotificationRequest request = SendNotificationRequest.builder()
+                .subject(subject)
+                .body(body)
+                .username(voucher.getUser().getUsername())
+                .build();
+        publishNotification(request);
+    }
+    private void publishNotificationForSpecificUser(SendNotificationRequest sendNotificationRequest) {
+        User user = userService.getByUsername(sendNotificationRequest.getUsername());
+
+        CreateNotificationRequest succeeded = CreateNotificationRequest.builder()
+                .body(sendNotificationRequest.getBody())
+                .status(sendNotificationRequest.getSubject())
+                .userId(user.getId())
+                .status("SUCCEEDED")
+                .build();
+        try {
+            ResponseEntity<NotificationResponse> notificationResponseResponseEntity = notificationClient.publishNotification(succeeded);
+            if (!notificationResponseResponseEntity.getStatusCode().is2xxSuccessful()) {
+                log.error("[Feign call to notification-svc failed] Couldn't post notification for user with id [%s]".formatted(user.getId()));
+
+            }
+        } catch (Exception e) {
+            throw new NotificationFeignClientNotWorkingException("Error sending notification for user with id [%s]".formatted(user.getId()));
         }
     }
 }

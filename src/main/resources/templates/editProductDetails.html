@@ -20,25 +20,31 @@
 
             <label for="product-name">Product Name:</label>
             <input type="text" id="product-name" value="Product Name 1" th:field="*{productName}">
+            <div th:if="${#fields.hasErrors('productName')}" th:errors="*{productName}" class="error-message" ></div>
 
             <label for="product-price">Price ($):</label>
             <input type="number" id="product-price" value="15.99" step="0.01" th:field="*{price}">
+            <div th:if="${#fields.hasErrors('price')}" th:errors="*{price}" class="error-message"></div>
 
             <label for="product-category">Category:</label>
             <select id="product-category" th:field="*{category}">
                 <option th:each="category : ${T(app.products.model.Category).values()}" th:value="${category}" th:text="${category}" >Electronics</option>
             </select>
+            <div th:if="${#fields.hasErrors('category')}" th:errors="*{category}" class="error-message"></div>
 
             <label for="product-quantity">Quantity per Unit:</label>
             <input type="number" id="product-quantity" value="50" th:field="*{quantityPerUnit}">
+            <div th:if="${#fields.hasErrors('quantityPerUnit')}" th:errors="*{quantityPerUnit}" class="error-message"></div>
 
             <label for="stock-quantity">Stock quantity:</label>
             <input type="number" id="stock-quantity" value="50" th:field="*{stockQuantity}">
+            <div th:if="${#fields.hasErrors('stockQuantity')}" th:errors="*{stockQuantity}" class="error-message"></div>
 
             <label for="product-description">Description:</label>
-            <textarea id="product-description" th:field="*{description}">This is a sample product description.</textarea>
+            <textarea id="product-description" th:field="*{description}"></textarea>
+            <div th:if="${#fields.hasErrors('description')}" th:errors="*{description}" class="error-message"></div>
 
-            <!-- Availability Toggle -->
+
             <div class="toggle-container">
                 <label class="switch">Available:</label>
                 <input type="radio" id="available-yes" th:field="*{available}" value="true">
@@ -48,7 +54,8 @@
                 <label for="available-no">No</label>
             </div>
             <label for="profile-pic-url">Profile Picture URL:</label>
-            <input type="text" id="profile-pic-url" placeholder="Paste profile picture URL" value="profile.jpg" th:field="*{image}">
+            <input type="text" id="profile-pic-url" placeholder="Paste profile picture URL"  th:field="*{image}">
+            <div th:if="${#fields.hasErrors('image')}" th:errors="*{image}" class="error-message"></div>
 
             <button type="submit" class="save-btn">Save Changes</button>
         </form>

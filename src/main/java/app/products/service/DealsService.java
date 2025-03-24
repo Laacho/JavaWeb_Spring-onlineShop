@@ -84,13 +84,10 @@ public class DealsService {
     }
 
     private SendNotificationRequest buildRequest(List<Product> products) {
-        SendNotificationRequest sendNotificationRequest=new SendNotificationRequest();
-        sendNotificationRequest.setSubject("New deals available");
         StringBuilder sb=new StringBuilder();
         sb.append("""
                 Discount Alert!
                 The following products are on discount today:
-                
                 """);
         for (Product product : products) {
             sb.append("\n");
@@ -98,7 +95,10 @@ public class DealsService {
             sb.append(product.getCategory());
         }
         sb.append("Head over to the Today's Deals tab and check them out!");
-        sendNotificationRequest.setBody(sb.toString());
-        return sendNotificationRequest;
+        return SendNotificationRequest.builder()
+                .subject("New deals available")
+                .body(sb.toString())
+                .build();
+
     }
 }
