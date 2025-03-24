@@ -4,8 +4,8 @@ package app.web;
 import app.products.model.Product;
 import app.products.service.ProductsService;
 import app.security.AuthenticationMetadata;
-import app.user.model.User;
 import app.user.service.UserService;
+import app.util.ProductUtility;
 import app.web.dto.HomePageSearchRequest;
 import app.web.dto.RegisterRequest;
 import jakarta.validation.Valid;
@@ -72,10 +72,8 @@ public class IndexController {
     public ModelAndView getHomePage(@RequestParam (value = "productName", required = false) String productName,
                                     @AuthenticationPrincipal AuthenticationMetadata auth,
                                     @ModelAttribute("searchedProducts") List<Product> searchedProducts) {
-        User user = userService.getById(auth.getUserId());
 
         ModelAndView modelAndView = new ModelAndView("home");
-        modelAndView.addObject("user",user);
         modelAndView.addObject("searchRequest",new HomePageSearchRequest());
 
         boolean isSearching = productName != null && !productName.isEmpty();
@@ -87,7 +85,8 @@ public class IndexController {
         modelAndView.addObject("allProducts", allProducts);
 
 
-        List<Product> recommendedProducts=productsService.getRecommendedProductsForUser(auth.getUserId());
+        List<Product> recommendedProductsFromDB=productsService.getRecommendedProductsForUser(auth.getUserId());
+        List<Product> recommendedProducts = ProductUtility.sortRecommendedProductsForUser(recommendedProductsFromDB);
         modelAndView.addObject("recommendedProducts", recommendedProducts);
 
         return modelAndView;

@@ -30,14 +30,13 @@ public class NotificationController {
 
     @GetMapping
     public ModelAndView getNotifications(@AuthenticationPrincipal AuthenticationMetadata auth) {
-        User user = userService.getById(auth.getUserId());
         ModelAndView modelAndView = new ModelAndView();
         modelAndView.setViewName("notification");
-        modelAndView.addObject("user", user);
+        User user = userService.getById(auth.getUserId());
         if(user.getRole().name().equals("ADMIN")) {
         //load post notification dto
             //needs to be a dto with subject body and a username
-            modelAndView.addObject("sendNotificationRequest",new SendNotificationRequest());
+            modelAndView.addObject("sendNotificationRequest", SendNotificationRequest.builder().build());
         }
         else{
             //he is user so
@@ -50,17 +49,12 @@ public class NotificationController {
     }
 
     @PostMapping("/publish")
-    public ModelAndView publishNotification(@Valid SendNotificationRequest sendNotificationRequest, BindingResult bindingResult,@AuthenticationPrincipal AuthenticationMetadata auth) {
-        ModelAndView modelAndView = new ModelAndView();
-        User user = userService.getById(auth.getUserId());
-        modelAndView.addObject("user", user);
+    public String publishNotification(@Valid SendNotificationRequest sendNotificationRequest, BindingResult bindingResult) {
         if(bindingResult.hasErrors()) {
-            modelAndView.setViewName("notification");
-            return modelAndView;
+            return "notification";
         }
         notificationService.publishNotification(sendNotificationRequest);
-        modelAndView.setViewName("redirect:/home");
-        return modelAndView;
+        return "redirect:/home";
     }
     @PutMapping
     public String changeUserNotifications(@AuthenticationPrincipal AuthenticationMetadata auth) {

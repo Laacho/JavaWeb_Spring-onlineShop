@@ -15,12 +15,11 @@ import java.util.UUID;
 public interface ProductsRepository extends JpaRepository<Product, UUID> {
     Optional<Product> findByName(String name);
 
-    List<Product> findAllByAvailable(boolean available);
+    List<Product> findAllByAvailableTrueAndOnDealFalse();
+    List<Product> findAllByOnDealFalse();
     List<Product> findAllByNameContainingIgnoreCase(String name);
 
-   // List<Product> findByIsOnDeal(boolean onDeal);
-//    @Query(value = "SELECT p FROM Product p WHERE p.isOnDeal=true")
-//    List<Product> findByOnDeal();
+
     List<Product> findAllByOnDealTrue();
 
 

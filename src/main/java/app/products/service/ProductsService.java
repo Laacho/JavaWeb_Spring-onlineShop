@@ -42,15 +42,15 @@ public class ProductsService {
 
     public List<Product> findAllProductsDependingOnRole(UserRole role) {
         if (role == UserRole.ADMIN) {
-            return productsRepository.findAll();
+            return productsRepository.findAllByOnDealFalse();
         }
-        return productsRepository.findAllByAvailable(true);
+        return productsRepository.findAllByAvailableTrueAndOnDealFalse();
     }
 
     public List<Product> getRecommendedProductsForUser(UUID userId) {
         User user = userService.getById(userId);
-        //if the user is a new acount( no orders) give him the most ordered products
-        //otherswise give him the most ordered of his items
+        //if the user is a new acount( no orders) give him the most ordered products from all users
+        //otherswise give him the most ordered products of his orders
         if (user.getOrders().isEmpty()) {
             return orderDetailsService.getMostOrderedProducts();
         } else {

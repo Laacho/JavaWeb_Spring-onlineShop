@@ -3,9 +3,6 @@ package app.web;
 import app.products.model.Product;
 import app.products.service.DealsService;
 import app.products.service.ProductsService;
-import app.security.AuthenticationMetadata;
-import app.user.model.User;
-import app.user.service.UserService;
 import app.web.dto.AddAProductRequest;
 import app.web.dto.AdminSearchRequest;
 import app.web.dto.EditProductDetails;
@@ -13,7 +10,6 @@ import app.web.mapper.DTOMapper;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
@@ -26,47 +22,36 @@ import java.util.UUID;
 @RequestMapping("/products")
 public class ProductController {
     private final ProductsService productsService;
-    private final UserService userService;
     private final DealsService dealsService;
 
     @Autowired
-    public ProductController(ProductsService productsService, UserService userService, DealsService dealsService) {
+    public ProductController(ProductsService productsService,DealsService dealsService) {
         this.productsService = productsService;
-        this.userService = userService;
         this.dealsService = dealsService;
     }
 
 
     @GetMapping("/add")
     @PreAuthorize("hasRole('ADMIN')")
-    public ModelAndView addProduct(@AuthenticationPrincipal AuthenticationMetadata auth) {
-        User user=userService.getById(auth.getUserId());
+    public ModelAndView addProduct() {
         ModelAndView modelAndView = new ModelAndView("addAproduct");
         modelAndView.addObject("addAProductRequest", new AddAProductRequest());
-        modelAndView.addObject("user", user);
         return modelAndView;
     }
 
     @PostMapping("/add")
-    public ModelAndView addProduct(@Valid AddAProductRequest addAProductRequest, BindingResult bindingResult,@AuthenticationPrincipal AuthenticationMetadata auth)  {
-        User user = userService.getById(auth.getUserId());
+    public String addProduct(@Valid AddAProductRequest addAProductRequest, BindingResult bindingResult)  {
         if(bindingResult.hasErrors()) {
-            ModelAndView modelAndView = new ModelAndView("addAproduct");
-            modelAndView.addObject("user", user);
-            return modelAndView;
+            return "addAproduct";
         }
         productsService.addAProduct(addAProductRequest);
-        ModelAndView modelAndView = new ModelAndView("redirect:/home");
-        modelAndView.addObject("user", user);
-        return modelAndView;
+        return "redirect:/home";
     }
 
     @GetMapping("/{id}/details")
-    public ModelAndView getProductDetails(@PathVariable UUID id,@RequestParam(required = false,defaultValue = "false") boolean added,@AuthenticationPrincipal AuthenticationMetadata auth) {
-        User user = userService.getById(auth.getUserId());
+    public ModelAndView getProductDetails(@PathVariable UUID id,@RequestParam(required = false,defaultValue = "false") boolean added) {
         Product product = productsService.getById(id);
         ModelAndView modelAndView = new ModelAndView("productDetails");
-        modelAndView.addObject("user",user);
         if(added) {
             modelAndView.addObject("added", added);
         }
@@ -76,50 +61,45 @@ public class ProductController {
 
     @GetMapping("/edit")
     @PreAuthorize("hasRole('ADMIN')")
-    public ModelAndView getEditProductPage(@AuthenticationPrincipal AuthenticationMetadata auth){
-        User user = userService.getById(auth.getUserId());
+    public ModelAndView getEditProductPage(){
         ModelAndView modelAndView = new ModelAndView("editProduct");
-        modelAndView.addObject("user", user);
         modelAndView.addObject("adminSearchRequest",new AdminSearchRequest());
         return modelAndView;
     }
     @GetMapping("/edit/search")
     @PreAuthorize("hasRole('ADMIN')")
-    public ModelAndView editProductSearch(@Valid AdminSearchRequest adminSearchRequest, @AuthenticationPrincipal AuthenticationMetadata auth){
-        User user = userService.getById(auth.getUserId());
+    public ModelAndView editProductSearch(@Valid AdminSearchRequest adminSearchRequest){
         ModelAndView modelAndView = new ModelAndView("editProduct");
-        modelAndView.addObject("user", user);
-
         List<Product> search = productsService.search(adminSearchRequest);
         modelAndView.addObject("search", search);
         return modelAndView;
     }
     @GetMapping("/{id}/edit")
     @PreAuthorize("hasRole('ADMIN')")
-    public ModelAndView loadSpecificProducts(@AuthenticationPrincipal AuthenticationMetadata auth, @PathVariable UUID id){
+    public ModelAndView loadSpecificProducts(@PathVariable UUID id){
         Product product= productsService.getById(id);
-        User user = userService.getById(auth.getUserId());
         ModelAndView modelAndView = new ModelAndView("editProductDetails");
-        modelAndView.addObject("user", user);
         modelAndView.addObject("product", product);
         modelAndView.addObject("editProductDetails", DTOMapper.mapProductToProductEditDetails(product));
         return modelAndView;
     }
 
     @PutMapping("/{id}/edit")
-    public String updateProduct(@PathVariable UUID id,@Valid EditProductDetails editProductDetails,BindingResult bindingResult ){
+    public ModelAndView updateProduct(@PathVariable UUID id,@Valid EditProductDetails editProductDetails,BindingResult bindingResult){
         if(bindingResult.hasErrors()) {
-            return "editProduct";
+            ModelAndView modelAndView=new ModelAndView("editProductDetails");
+            modelAndView.addObject("editProductDetails", editProductDetails);
+            Product product = productsService.getById(id);
+            modelAndView.addObject("product", product);
+            return modelAndView;
         }
         productsService.updateProduct(id,editProductDetails);
 
-        return "redirect:/home";
+        return new ModelAndView("redirect:/home");
     }
     @GetMapping("/today-deals")
-    public ModelAndView getTodayDeals(@AuthenticationPrincipal AuthenticationMetadata auth) {
-        User user = userService.getById(auth.getUserId());
+    public ModelAndView getTodayDeals() {
         ModelAndView modelAndView = new ModelAndView("todaysDeals");
-        modelAndView.addObject("user", user);
         List<Product> dailyDeals= dealsService.getDailyDeals();
         modelAndView.addObject("dailyDeals", dailyDeals);
         return modelAndView;

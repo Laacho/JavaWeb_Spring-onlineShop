@@ -6,6 +6,7 @@ import lombok.experimental.UtilityClass;
 
 import java.util.Comparator;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -23,5 +24,12 @@ public class ProductUtility {
                         LinkedHashMap::new
                 ));
         user.getShoppingCart().setProducts(collect);
+    }
+
+    public static List<Product> sortRecommendedProductsForUser(List<Product> products){
+        return products.stream()
+                .sorted(Comparator.comparing(Product::getName)
+                        .thenComparing(Product::getPrice))
+                .toList();
     }
 }

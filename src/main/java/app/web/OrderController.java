@@ -33,7 +33,6 @@ public class OrderController {
 
         List<Order> allOrdersForUser = orderService.findByUser(user);
         ModelAndView modelAndView = new ModelAndView("orderHistory");
-        modelAndView.addObject("user", user);
         modelAndView.addObject("allOrdersForUser", allOrdersForUser);
         return modelAndView;
     }

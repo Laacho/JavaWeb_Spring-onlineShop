@@ -69,30 +69,19 @@ public class ShoppingCartController {
     }
 
     @PostMapping("/{id}/remove")
-    public ModelAndView removeProduct(@PathVariable UUID id, @AuthenticationPrincipal AuthenticationMetadata auth) {
+    public String removeProduct(@PathVariable UUID id, @AuthenticationPrincipal AuthenticationMetadata auth) {
         shoppingCartService.removeProduct(id,auth.getUserId());
-        ModelAndView modelAndView = new ModelAndView("redirect:/shopping-cart");
-        User user = userService.getById(auth.getUserId());
-        modelAndView.addObject("user", user);
-
-        return modelAndView;
+        return "redirect:/shopping-cart";
     }
     @DeleteMapping("/clear")
-    public ModelAndView empty(@AuthenticationPrincipal AuthenticationMetadata auth) {
+    public String empty(@AuthenticationPrincipal AuthenticationMetadata auth) {
         shoppingCartService.empty(auth.getUserId());
-        ModelAndView modelAndView = new ModelAndView("redirect:/shopping-cart");
-        User user = userService.getById(auth.getUserId());
-        modelAndView.addObject("user", user);
-        return modelAndView;
+        return "redirect:/shopping-cart";
     }
     @PutMapping("/calculate")
     public ModelAndView calculate(@Valid ApplyVoucherRequest applyVoucherRequest, BindingResult bindingResult, HttpSession session, @AuthenticationPrincipal AuthenticationMetadata auth) {
-        User user = userService.getById(auth.getUserId());
         if(bindingResult.hasErrors()){
-            ModelAndView modelAndView = new ModelAndView();
-            modelAndView.setViewName("redirect:/shopping-cart");
-            modelAndView.addObject("user", user);
-            return modelAndView;
+            return new ModelAndView("redirect:/shopping-cart");
         }
         BigDecimal totalAmount = shoppingCartService.applyVoucher(applyVoucherRequest, auth.getUserId());
         session.setAttribute("totalAmount", totalAmount);
@@ -101,30 +90,22 @@ public class ShoppingCartController {
         voucherCode=applyVoucherRequest.getVoucherCode();
        // redirectAttributes.addFlashAttribute("totalAmount", totalAmount);
        modelAndView.addObject("totalAmount",totalAmount);
-        modelAndView.addObject("user", user);
         return modelAndView;
     }
     @PostMapping("/{id}/decrease")
-    public ModelAndView decreaseItem(@PathVariable UUID id,@AuthenticationPrincipal AuthenticationMetadata auth) {
+    public String decreaseItem(@PathVariable UUID id,@AuthenticationPrincipal AuthenticationMetadata auth) {
        shoppingCartService.decrementItemQuantity(id,auth.getUserId());
-        ModelAndView modelAndView = new ModelAndView("redirect:/shopping-cart");
-        User user = userService.getById(auth.getUserId());
-        modelAndView.addObject("user", user);
-        return modelAndView;
+        return "redirect:/shopping-cart";
 
     }
     @PostMapping("/{id}/increase")
-    public ModelAndView increaseItem(@PathVariable UUID id,@AuthenticationPrincipal AuthenticationMetadata auth) {
+    public String increaseItem(@PathVariable UUID id,@AuthenticationPrincipal AuthenticationMetadata auth) {
         shoppingCartService.incrementItemQuantity(id,auth.getUserId());
-        ModelAndView modelAndView = new ModelAndView("redirect:/shopping-cart");
-        User user = userService.getById(auth.getUserId());
-        modelAndView.addObject("user", user);
-        return modelAndView;
+        return "redirect:/shopping-cart";
     }
 
     @PostMapping("/order")
-    public ModelAndView order(@RequestParam BigDecimal totalAmount,@AuthenticationPrincipal AuthenticationMetadata auth) {
-        User user = userService.getById(auth.getUserId());
+    public String order(@RequestParam BigDecimal totalAmount,@AuthenticationPrincipal AuthenticationMetadata auth) {
         Order order;
         if(voucherUsed){
             order = shoppingCartService.placeOrder(totalAmount, auth.getUserId(),voucherCode);
@@ -136,9 +117,7 @@ public class ShoppingCartController {
         voucherService.checkForGivingVoucher(auth.getUserId());
         notificationService.sendNotificationWithTrackingNumber(trackingNumber,auth.getUserId());
         voucherUsed=false;
-        ModelAndView modelAndView = new ModelAndView("redirect:/shipment");
-        modelAndView.addObject("user", user);
-        return modelAndView;
+        return "redirect:/shipment";
     }
 
 
