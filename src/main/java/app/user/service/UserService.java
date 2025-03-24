@@ -2,13 +2,12 @@ package app.user.service;
 
 import app.event.ShoppingCartCreated;
 import app.event.UserRegistered;
-import app.exceptions.DomainException;
+import app.exceptions.EntityNotFoundException;
+import app.exceptions.InvalidUsernameOrAddressException;
 import app.order_details.model.OrderDetails;
 import app.orders.model.Order;
 import app.products.model.Product;
 import app.security.AuthenticationMetadata;
-import app.shopping_cart.model.ShoppingCart;
-import app.shopping_cart.service.ShoppingCartService;
 import app.user.model.User;
 import app.user.model.UserRole;
 import app.user.repository.UserRepository;
@@ -16,7 +15,6 @@ import app.web.dto.EditProfileRequest;
 import app.web.dto.RegisterRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.context.event.EventListener;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -51,7 +49,7 @@ public class UserService implements UserDetailsService {
     public void register(RegisterRequest registerRequest) {
         Optional<User> optionalUser = userRepository.findByUsernameOrAddress(registerRequest.getUsername(), registerRequest.getAddress());
         if (optionalUser.isPresent()) {
-            throw new DomainException("Username or password are incorrect");
+            throw new InvalidUsernameOrAddressException("Username or password are incorrect");
         }
         User user = initializeDefaultUser(registerRequest);
         userRepository.save(user);
@@ -59,13 +57,13 @@ public class UserService implements UserDetailsService {
         eventPublisher.publishEvent(userRegistered);
     }
     public User getById(UUID id) {
-
         return userRepository.findById(id)
-                .orElseThrow(() -> new DomainException("User with id [%s] does not exist.".formatted(id)));
+                .orElseThrow(() -> new EntityNotFoundException("User with id [%s] does not exist.".formatted(id)));
     }
 
     public User getByUsername(String username) {
-        return userRepository.findByUsername(username).orElseThrow(() -> new DomainException("User with name [%s] does not exist.".formatted(username)));
+        return userRepository.findByUsername(username)
+                .orElseThrow(() -> new EntityNotFoundException("User with name [%s] does not exist.".formatted(username)));
     }
 
     public List<User> getAllByRole(UserRole role) {

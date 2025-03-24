@@ -42,7 +42,7 @@
                             <button class="quantity-btn">➕</button>
                         </form>
                     </div>
-<!--                    <p class="product-price" th:text="'$'+${map.key.price}">$10.00</p>-->
+
                     <p class="product-price" th:text="'$' + (${map.key.isOnDeal} ? ${map.key.price.subtract(map.key.discountAmount)} : ${map.key.price})">$10.00</p>
                 </div>
                 <form th:action="@{'/shopping-cart/'+${map.key.id}+'/remove'}" th:method="POST">
@@ -55,8 +55,9 @@
         <!-- Voucher & Order Section -->
         <div class="cart-actions">
             <form th:action="@{/shopping-cart/calculate}" th:method="PUT" th:object="${applyVoucherRequest}">
-            <input type="text" placeholder="Enter voucher code" class="voucher-input" th:field="*{voucherCode}" required>
+            <input type="text" placeholder="Enter voucher code" class="voucher-input" th:field="*{voucherCode}" >
             <button class="apply-voucher">Apply Voucher</button>
+                <div class="error-message" th:if="${#fields.hasErrors('voucherCode')}" th:errors="*{voucherCode}"></div>
             </form>
         </div>
           <div class="total-amount">

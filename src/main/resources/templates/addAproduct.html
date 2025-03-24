@@ -49,6 +49,7 @@
             <textarea id="description"  rows="4" th:field="*{description}" ></textarea>
             <div th:if="${#fields.hasErrors('description')}" th:errors="*{description}" class="error-message"></div>
 
+            <div th:text="${productAlreadyExists}" class="error-message"></div>
             <button  class="btn">Add Product </button>
         </form>
     </div>

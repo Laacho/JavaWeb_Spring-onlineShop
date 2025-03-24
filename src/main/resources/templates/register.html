@@ -1,4 +1,4 @@
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -18,9 +18,9 @@
 
             <label for="address">Address</label>
             <input placeholder="Address" type="text" id="address" name="address" class="wide-input" th:field="*{address}">
-            <div th:if="${#fields.hasErrors('address')}" class="error-message" th:errors="*{address}"></div>
+            <div th:if="${#fields.hasErrors('address')}" th:errors="*{address}"></div>
 
-            
+            <div th:if="${errorMessage}" th:text="${errorMessage}" class="error-message" ></div>
             <button type="submit" class="btn">Register</button>
         
         </form>

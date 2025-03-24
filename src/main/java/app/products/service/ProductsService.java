@@ -1,7 +1,8 @@
 package app.products.service;
 
 
-import app.exceptions.DomainException;
+import app.exceptions.EntityNotFoundException;
+import app.exceptions.ProductNameAlreadyExistsException;
 import app.order_details.model.OrderDetails;
 import app.order_details.service.OrderDetailsService;
 import app.products.model.Product;
@@ -63,7 +64,8 @@ public class ProductsService {
     }
 
     public Product getById(UUID id) {
-        return productsRepository.findById(id).orElseThrow(() -> new DomainException("Product not found"));
+        return productsRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Product not found"));
     }
 
 
@@ -106,7 +108,7 @@ public class ProductsService {
     private void checkForUniqueProductName(String productName) {
         Optional<Product> byName = productsRepository.findByName(productName);
         if (byName.isPresent()) {
-            throw new DomainException("Product name already exists");
+            throw new ProductNameAlreadyExistsException("Product name already exists");
         }
     }
 

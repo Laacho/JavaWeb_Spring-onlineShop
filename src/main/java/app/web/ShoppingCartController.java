@@ -81,7 +81,7 @@ public class ShoppingCartController {
     @PutMapping("/calculate")
     public ModelAndView calculate(@Valid ApplyVoucherRequest applyVoucherRequest, BindingResult bindingResult, HttpSession session, @AuthenticationPrincipal AuthenticationMetadata auth) {
         if(bindingResult.hasErrors()){
-            return new ModelAndView("redirect:/shopping-cart");
+            return new ModelAndView("shoppingCart");
         }
         BigDecimal totalAmount = shoppingCartService.applyVoucher(applyVoucherRequest, auth.getUserId());
         session.setAttribute("totalAmount", totalAmount);
