@@ -31,7 +31,9 @@ public class UserInit implements CommandLineRunner {
                     .password("admin")
                     .address("ONLINE SHOP CENTRAL")
                     .build();
-           userService.initializeDefaultAdmin(registerRequest);
+            userService.register(registerRequest);
+            userService.promoteToAdmin("admin");
+
        }
     }
 }

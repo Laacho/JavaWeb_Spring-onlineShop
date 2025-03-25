@@ -70,21 +70,7 @@ public class UserService implements UserDetailsService {
         return userRepository.findAllByRole(role);
     }
 
-    @Transactional
-    public void initializeDefaultAdmin(RegisterRequest registerRequest) {
-        LocalDateTime now = LocalDateTime.now();
-        User defaultAdmin = User.builder()
-                .username(registerRequest.getUsername())
-                .password(passwordEncoder.encode(registerRequest.getPassword()))
-                .address(registerRequest.getAddress())
-                .role(UserRole.ADMIN)
-                .isActive(true)
-                .createdAt(now)
-                .wantsNotifications(false)
-                .updatedAt(now)
-                .build();
-        userRepository.save(defaultAdmin);
-    }
+
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
@@ -153,7 +139,11 @@ public class UserService implements UserDetailsService {
         user.setWantsNotifications(!wantsNotifications);
         userRepository.save(user);
     }
-
+    public void promoteToAdmin(String admin) {
+        User user = getByUsername(admin);
+        user.setRole(UserRole.ADMIN);
+        userRepository.save(user);
+    }
     @EventListener
     protected void handleShoppingCartCreated(ShoppingCartCreated shoppingCartCreated){
         User user = getById(shoppingCartCreated.getShoppingCart().getUser().getId());
@@ -165,7 +155,10 @@ public class UserService implements UserDetailsService {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         UsernamePasswordAuthenticationToken newAuth = new UsernamePasswordAuthenticationToken(
                 updatedUser, authentication.getCredentials(), updatedUser.getAuthorities());
+//        SecurityContextHolder.getContext().setAuthentication(newAuth);
+        SecurityContextHolder.clearContext(); // Clears old authentication
         SecurityContextHolder.getContext().setAuthentication(newAuth);
+
     }
 
     private User initializeDefaultUser(RegisterRequest registerRequest) {
@@ -181,4 +174,6 @@ public class UserService implements UserDetailsService {
                 .updatedAt(now)
                 .build();
     }
+
+
 }

@@ -63,14 +63,14 @@
 
         <form class="admin-form" th:object="${sendNotificationRequest}" th:action="@{/notifications/publish}" th:method="POST">
             <label for="notif-subject">Subject:</label>
-            <input type="text" id="notif-subject" placeholder="Enter subject" required th:field="*{subject}">
-
+            <input type="text" id="notif-subject" placeholder="Enter subject"  th:field="*{subject}">
+            <div th:if="${#fields.hasErrors('subject')}" th:errors="*{subject}" class="error-message"></div>
             <label for="notif-body">Body:</label>
-            <textarea id="notif-body" placeholder="Enter message" required th:field="*{body}"></textarea>
-
+            <textarea id="notif-body" placeholder="Enter message"  th:field="*{body}"></textarea>
+            <div th:if="${#fields.hasErrors('body')}" th:errors="*{body}" class="error-message"></div>
             <label for="notif-username">Username:</label>
             <input type="text" id="notif-username" placeholder="Enter username (optional)" th:field="*{username}">
-
+            <div th:if="${#fields.hasErrors('username')}" th:errors="*{username}" class="error-message"></div>
 
 
             <button type="submit" class="send-btn">Send Notification</button>

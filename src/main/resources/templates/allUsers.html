@@ -42,7 +42,7 @@
                     </td>
                     <td>
                         <span class="status active" th:if="${user.active}">ACTIVE</span>
-                        <span class="status inactive" th:if="${user.active==false}">INACTIVE</span>
+                        <span class="status inactive" th:if="${!user.active}">INACTIVE</span>
                     </td>
                     <td>
                         <form th:action="@{'/user/'+${user.id}+'/status'}" th:method="PUT">

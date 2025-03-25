@@ -192,3 +192,8 @@ th {
 .clear-btn:hover {
     background-color: #b71c1c;
 }
+.error-message {
+    color: red;
+    font-size: 15px;
+    min-height: 16px;
+}

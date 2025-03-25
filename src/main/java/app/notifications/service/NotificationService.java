@@ -124,7 +124,7 @@ public class NotificationService {
 
         CreateNotificationRequest succeeded = CreateNotificationRequest.builder()
                 .body(sendNotificationRequest.getBody())
-                .status(sendNotificationRequest.getSubject())
+                .subject(sendNotificationRequest.getSubject())
                 .userId(user.getId())
                 .status("SUCCEEDED")
                 .build();
