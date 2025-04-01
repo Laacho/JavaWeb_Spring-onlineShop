@@ -22,7 +22,7 @@ public class UserInit implements CommandLineRunner {
     }
 
     @Override
-    public void run(String... args) throws Exception {
+    public void run(String... args)  {
         //checking for min 1 admin
         List<User> allByRole = userService.getAllByRole(UserRole.ADMIN);
         if(allByRole.isEmpty()) {

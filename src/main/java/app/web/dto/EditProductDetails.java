@@ -13,7 +13,7 @@ import java.math.BigDecimal;
 
 @Data
 @Builder
-public class EditProductDetails {
+public class    EditProductDetails {
 
     @NotBlank(message = "Product name cannot be empty!")
     @Size(min = 5,max = 100,message = "Product name must be between 5 and 100 characters!")

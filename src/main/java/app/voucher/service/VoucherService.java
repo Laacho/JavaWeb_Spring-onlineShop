@@ -1,11 +1,9 @@
 package app.voucher.service;
 
-import app.notifications.service.NotificationService;
 import app.user.model.User;
 import app.user.service.UserService;
 import app.voucher.model.Voucher;
 import app.voucher.repository.VoucherRepository;
-import app.web.dto.SendNotificationRequest;
 import org.apache.commons.lang.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;

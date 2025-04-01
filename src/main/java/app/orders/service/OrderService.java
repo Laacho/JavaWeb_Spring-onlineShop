@@ -25,7 +25,7 @@ public class OrderService {
     private final UserService userService;
     private final OrderDetailsRepository orderDetailsRepository;
     private final ProductsService productsService;
-//implement event
+
     @Autowired
     public OrderService(OrdersRepository ordersRepository, UserService userService, OrderDetailsRepository orderDetailsRepository, ProductsService productsService) {
         this.ordersRepository = ordersRepository;

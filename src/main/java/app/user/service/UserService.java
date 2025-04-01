@@ -139,8 +139,8 @@ public class UserService implements UserDetailsService {
         user.setWantsNotifications(!wantsNotifications);
         userRepository.save(user);
     }
-    public void promoteToAdmin(String admin) {
-        User user = getByUsername(admin);
+    public void promoteToAdmin(String username) {
+        User user = getByUsername(username);
         user.setRole(UserRole.ADMIN);
         userRepository.save(user);
     }
@@ -155,8 +155,7 @@ public class UserService implements UserDetailsService {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         UsernamePasswordAuthenticationToken newAuth = new UsernamePasswordAuthenticationToken(
                 updatedUser, authentication.getCredentials(), updatedUser.getAuthorities());
-//        SecurityContextHolder.getContext().setAuthentication(newAuth);
-        SecurityContextHolder.clearContext(); // Clears old authentication
+        SecurityContextHolder.clearContext();
         SecurityContextHolder.getContext().setAuthentication(newAuth);
 
     }

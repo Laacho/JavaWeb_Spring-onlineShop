@@ -27,7 +27,7 @@ public class UserInterceptor implements HandlerInterceptor {
     @Override
     public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler, ModelAndView modelAndView) {
         String endpoint = request.getRequestURI();
-        if(!excludedUrls.contains(endpoint)) {
+        if(!excludedUrls.contains(endpoint) && modelAndView!=null) {
             AuthenticationMetadata principal = (AuthenticationMetadata) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
             User user = userService.getById(principal.getUserId());
             modelAndView.addObject("user", user);

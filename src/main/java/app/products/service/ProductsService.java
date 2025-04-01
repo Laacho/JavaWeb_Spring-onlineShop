@@ -85,31 +85,8 @@ public class ProductsService {
         product.setAvailable(editProductDetails.getAvailable());
         product.setPhoto(editProductDetails.getImage());
 
+        product.setUpdatedAt(LocalDateTime.now());
         productsRepository.save(product);
-    }
-
-    private Product initProduct(AddAProductRequest productRequest) {
-        LocalDateTime now = LocalDateTime.now();
-        return Product.builder()
-                .name(productRequest.getProductName())
-                .photo(productRequest.getProductImageURL())
-                .price(productRequest.getPrice())
-                .category(productRequest.getCategory())
-                .quantityPerUnit(productRequest.getQuantityPerUnit())
-                .stockQuantity(productRequest.getStockQuantity())
-                .description(productRequest.getDescription())
-                .available(true)
-                .onDeal(false)
-                .createdAt(now)
-                .updatedAt(now)
-                .build();
-    }
-
-    private void checkForUniqueProductName(String productName) {
-        Optional<Product> byName = productsRepository.findByName(productName);
-        if (byName.isPresent()) {
-            throw new ProductNameAlreadyExistsException("Product name already exists");
-        }
     }
 
     public void reduceItemQuantity(List<OrderDetails> orderDetailsList) {
@@ -135,5 +112,29 @@ public class ProductsService {
 
     public List<Product> findAllProductsOnDeal() {
         return productsRepository.findAllByOnDealTrue();
+    }
+
+    private Product initProduct(AddAProductRequest productRequest) {
+        LocalDateTime now = LocalDateTime.now();
+        return Product.builder()
+                .name(productRequest.getProductName())
+                .photo(productRequest.getProductImageURL())
+                .price(productRequest.getPrice())
+                .category(productRequest.getCategory())
+                .quantityPerUnit(productRequest.getQuantityPerUnit())
+                .stockQuantity(productRequest.getStockQuantity())
+                .description(productRequest.getDescription())
+                .available(true)
+                .onDeal(false)
+                .createdAt(now)
+                .updatedAt(now)
+                .build();
+    }
+
+    private void checkForUniqueProductName(String productName) {
+        Optional<Product> byName = productsRepository.findByName(productName);
+        if (byName.isPresent()) {
+            throw new ProductNameAlreadyExistsException("Product name already exists");
+        }
     }
 }
